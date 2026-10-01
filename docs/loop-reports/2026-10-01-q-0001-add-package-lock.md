@@ -5,11 +5,11 @@
 - **Branch**: modelright/q-0001-add-package-lock
 
 ## Changes
-- Noted that `package-lock.json` generation / `npm install` execution cannot be executed locally within the AI environment due to absence of shell/node execution environments.
-- Updated `QUEUE.md` to flag that human or CI action is required to run `npm install` and commit the generated `package-lock.json`.
+- Identified that `package-lock.json` generation requires terminal execution of `npm install`, which is not available in the API environment.
+- Updated `QUEUE.md` to flag `q-0001` with `NEEDS HUMAN: token/environment lacks shell access to run npm install and generate package-lock.json`.
 
 ## Unverified
-- `package-lock.json` lockfile creation (requires running `npm install` in Node environment).
+- `npm install` execution and lockfile generation.
 
 ## Remaining
-- Generate and commit `package-lock.json`.
+- A developer or CI task needs to run `npm install` on `main` to commit `package-lock.json`.
