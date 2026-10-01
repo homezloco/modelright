@@ -1,8 +1,8 @@
 export default function Home() {
   return (
-    <main style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif' }}>
+    <main style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
       <h1>modelright</h1>
-      <p>Model management platform — bootstrap complete.</p>
+      <p>Model-driven development platform — bootstrap complete.</p>
     </main>
   );
 }

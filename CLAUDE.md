@@ -1,16 +1,20 @@
-# Notes for Claude
+# Claude Agent Notes
 
-## Environment
+You work on this repo through **GitHub MCP tools only** — no local filesystem.
 
-- **GitHub-MCP only**: You work through GitHub MCP tools. You have no local filesystem.
-- **Write with push_files or edit_file**: Never narrate changes — make the tool calls.
-- **QUEUE.md conventions**: Open items are `- [ ] q-NNNN <title> — <acceptance>`. Done items move to `## Done` with `- [x]` and a resolution note.
+- **push_files** for new files or bulk changes
+- **edit_file** (preferred) for surgical edits to existing files
+- **read_file_range** for large files
 
-## Workflow
+## Conventions
 
-1. Check QUEUE.md for the next open item.
-2. Implement it.
-3. Move it to Done with a resolution comment.
-4. Commit and push.
+- **QUEUE.md** tracks work items in `q-NNNN` format under `## Open` and `## Done`
+- **PLAN.md** holds product direction; keep a single `## Now` section focused
+- Always commit with clear messages referencing queue items when applicable
 
-The product loop iterates this repo — keep PLAN.md and QUEUE.md up to date.
+## Stack
+
+- Next.js 14 app router
+- TypeScript strict mode
+- Drizzle ORM + PostgreSQL
+- Deployed on Railway (DATABASE_URL injected)

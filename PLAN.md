@@ -2,6 +2,9 @@
 
 ## Now
 
-- Bootstrap complete: Next.js + Drizzle skeleton in place
-- Health route ready for Railway deploy-verify
-- Awaiting first product feature from the improvement loop
+Bootstrap complete. The product loop will define the model-driven development features.
+
+Next priorities:
+- Define core data model for development artifacts
+- Build initial UI for model authoring
+- Establish agent workflows for code generation

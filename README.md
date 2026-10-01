@@ -1,6 +1,6 @@
 # modelright
 
-Model management platform.
+Model-driven development platform.
 
 ## Setup
 
@@ -9,28 +9,23 @@ Model management platform.
    npm install
    ```
 
-2. Set up your database:
-   - Copy `.env.example` to `.env`
-   - Set `DATABASE_URL` to your PostgreSQL connection string
+2. Set up environment:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your DATABASE_URL
+   ```
 
-3. Generate and run migrations:
+3. Run database migrations:
    ```bash
    npm run db:generate
    npm run db:migrate
    ```
 
-4. Start the development server:
+4. Start development server:
    ```bash
    npm run dev
    ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the app.
+The app runs at http://localhost:3000
 
-## Scripts
-
-- `npm run dev` — Start development server
-- `npm run build` — Build for production
-- `npm run start` — Start production server
-- `npm run typecheck` — Type-check without building
-- `npm run db:generate` — Generate Drizzle migrations
-- `npm run db:migrate` — Apply migrations to database
+Health check: http://localhost:3000/health
