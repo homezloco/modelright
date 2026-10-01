@@ -1,0 +1,7 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "id": "0000_ingest_schema",
+  "prevId": "0000000000000000000000000000000000000000000000000000000000000000",
+  "comments": true
+}
