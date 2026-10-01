@@ -2,12 +2,6 @@
 
 ## Now
 
-Bootstrap complete. Ready for the product loop to define and build the actual features.
-
-The skeleton provides:
-- Next.js + React foundation
-- Drizzle ORM + PostgreSQL wiring
-- Type safety with TypeScript
-- Health check endpoint for deployment
-
-Next: Define the domain model and first user-facing feature.
+- Bootstrap complete: Next.js + Drizzle skeleton in place
+- Health route ready for Railway deploy-verify
+- Awaiting first product feature from the improvement loop

@@ -1,6 +1,6 @@
 # modelright
 
-Model everything right.
+Model management platform.
 
 ## Setup
 
@@ -9,11 +9,9 @@ Model everything right.
    npm install
    ```
 
-2. Configure your database:
-   ```bash
-   cp .env.example .env
-   # Edit .env and set DATABASE_URL to your PostgreSQL connection string
-   ```
+2. Set up your database:
+   - Copy `.env.example` to `.env`
+   - Set `DATABASE_URL` to your PostgreSQL connection string
 
 3. Generate and run migrations:
    ```bash
@@ -26,21 +24,13 @@ Model everything right.
    npm run dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000)
-
-## Stack
-
-- **Next.js 14** — App Router
-- **React 18** — UI
-- **Drizzle ORM** — Type-safe SQL
-- **PostgreSQL** — Database
-- **TypeScript** — Type safety
+Open [http://localhost:3000](http://localhost:3000) to see the app.
 
 ## Scripts
 
 - `npm run dev` — Start development server
 - `npm run build` — Build for production
-- `npm start` — Run production build
-- `npm run typecheck` — Type check without emitting
-- `npm run db:generate` — Generate migrations from schema
+- `npm run start` — Start production server
+- `npm run typecheck` — Type-check without building
+- `npm run db:generate` — Generate Drizzle migrations
 - `npm run db:migrate` — Apply migrations to database

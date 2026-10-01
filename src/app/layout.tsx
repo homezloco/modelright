@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'modelright',
-  description: 'Model everything right',
+  description: 'Model management platform',
 };
 
 export default function RootLayout({

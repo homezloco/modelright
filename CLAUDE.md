@@ -1,24 +1,16 @@
-# Notes for Claude agents iterating modelright
+# Notes for Claude
 
 ## Environment
 
-- **GitHub-only**: You have GitHub MCP tools. No local filesystem.
-- **Write with push_files**: For new files or bulk changes, use `mcp_github_push_files`.
-- **Edit with edit_file**: For targeted changes to existing files, prefer `mcp_github_edit_file` (sends only diffs).
-- **Read carefully**: Use `mcp_github_read_file_range` for large files to avoid context overflow.
+- **GitHub-MCP only**: You work through GitHub MCP tools. You have no local filesystem.
+- **Write with push_files or edit_file**: Never narrate changes — make the tool calls.
+- **QUEUE.md conventions**: Open items are `- [ ] q-NNNN <title> — <acceptance>`. Done items move to `## Done` with `- [x]` and a resolution note.
 
-## Workflow conventions
+## Workflow
 
-- **QUEUE.md**: The source of truth for what's next. Items in `## Open` are queued work in priority order.
-- **Item format**: `- [ ] q-NNNN <title> — <acceptance criteria>`
-- **Completion**: When done, move the item to `## Done` and check the box.
-- **PLAN.md**: The high-level product vision. Keep a single `## Now` section for current focus.
+1. Check QUEUE.md for the next open item.
+2. Implement it.
+3. Move it to Done with a resolution comment.
+4. Commit and push.
 
-## This repo
-
-- Next.js 14 app router
-- Drizzle ORM + PostgreSQL
-- TypeScript strict mode
-- Health check at `/health` (required for deployment)
-
-When making schema changes, remember to run `db:generate` and `db:migrate`.
+The product loop iterates this repo — keep PLAN.md and QUEUE.md up to date.

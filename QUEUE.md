@@ -2,10 +2,8 @@
 
 ## Open
 
-- [ ] q-0001 Define core domain model — Schema tables and relationships documented in PLAN.md
-- [ ] q-0002 Add basic UI scaffold — Navigation and layout components in place
-- [ ] q-0003 Set up CI workflow — GitHub Actions running typecheck and build on PR
+- [ ] q-0001 Add lockfile — Run `npm install` and commit package-lock.json for reproducible builds
+- [ ] q-0002 Basic CI workflow — Add GitHub Actions: typecheck + build on push to main
+- [ ] q-0003 Define initial schema — Replace placeholder table with core domain model
 
 ## Done
-
-- [x] Bootstrap repository with Next.js + Drizzle skeleton
