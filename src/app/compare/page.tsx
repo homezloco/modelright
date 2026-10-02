@@ -6,9 +6,10 @@ import { eq, asc, desc } from 'drizzle-orm';
 export const dynamic = 'force-dynamic';
 
 interface ComparePageProps {
-  searchParams: {
-    a?: string;
-    b?: string;
+  searchParams?: {
+    a?: string | string[];
+    b?: string | string[];
+    [key: string]: string | string[] | undefined;
   };
 }
 
@@ -37,8 +38,11 @@ function parseModelParam(param?: string) {
 }
 
 export default async function ComparePage({ searchParams }: ComparePageProps) {
-  const modelAKey = parseModelParam(searchParams.a);
-  const modelBKey = parseModelParam(searchParams.b);
+  const paramA = Array.isArray(searchParams?.a) ? searchParams?.a[0] : searchParams?.a;
+  const paramB = Array.isArray(searchParams?.b) ? searchParams?.b[0] : searchParams?.b;
+
+  const modelAKey = parseModelParam(paramA);
+  const modelBKey = parseModelParam(paramB);
 
   let allModels: DBModelItem[] = [];
 
@@ -102,7 +106,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
     : null;
 
   const showComparison = modelA && modelB;
-  const isInvalidSelection = (searchParams.a || searchParams.b) && !showComparison;
+  const isInvalidSelection = Boolean((paramA || paramB) && !showComparison);
 
   return (
     <main style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif', maxWidth: '900px', margin: '0 auto' }}>
