@@ -1,110 +1,74 @@
-import { eq, asc } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { models, providers } from '@/db/schema';
+import { eq, asc } from 'drizzle-orm';
 
-export interface ModelRow {
-  id: string;
-  name: string;
-  slug: string;
-  providerName: string;
-  providerSlug: string;
-  contextWindow: number;
-  inputPricePerM: string;
-  outputPricePerM: string;
-  updatedAt: Date;
-}
+export const dynamic = 'force-dynamic';
 
-async function getModels(): Promise<ModelRow[]> {
+export default async function ModelsPage() {
+  let modelRows: Array<{
+    id: string;
+    name: string;
+    contextWindow: number;
+    inputPricePerM: string;
+    outputPricePerM: string;
+    updatedAt: Date;
+    providerName: string;
+    providerSlug: string;
+  }> = [];
+
   try {
-    const rows = await db
+    const results = await db
       .select({
         id: models.id,
         name: models.name,
-        slug: models.slug,
-        providerName: providers.name,
-        providerSlug: providers.slug,
         contextWindow: models.contextWindow,
         inputPricePerM: models.inputPricePerM,
         outputPricePerM: models.outputPricePerM,
         updatedAt: models.updatedAt,
+        providerName: providers.name,
+        providerSlug: providers.slug,
       })
       .from(models)
       .innerJoin(providers, eq(models.providerId, providers.id))
       .orderBy(asc(providers.name), asc(models.name));
 
-    return rows;
-  } catch (err) {
-    // If DB is not connected or query fails, return empty list gracefully
-    console.error('Failed to fetch models from database:', err);
-    return [];
+    modelRows = results;
+  } catch (error) {
+    // In environments where DB is unavailable at build/runtime or no connection string
+    console.error('Failed to load models:', error);
   }
-}
-
-function formatPrice(priceStr: string): string {
-  const num = parseFloat(priceStr);
-  if (isNaN(num)) return `$${priceStr}`;
-  return `$${num.toFixed(2)}`;
-}
-
-function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
-
-export default async function ModelsPage() {
-  const modelList = await getModels();
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'system-ui, sans-serif' }}>
-      <header style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>AI Models Directory</h1>
-        <p style={{ color: '#666' }}>
-          Compare pricing, context windows, and specifications across LLM providers.
-        </p>
-      </header>
+    <main style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
+      <h1 style={{ marginBottom: '1.5rem', fontSize: '1.875rem', fontWeight: 'bold' }}>Models</h1>
 
-      {modelList.length === 0 ? (
-        <div
-          style={{
-            padding: '3rem 1.5rem',
-            textAlign: 'center',
-            backgroundColor: '#f9fafb',
-            border: '1px solid #e5e7eb',
-            borderRadius: '8px',
-            color: '#4b5563',
-          }}
-        >
-          <p style={{ fontSize: '1.125rem', fontWeight: 500, marginBottom: '0.5rem' }}>No models found</p>
-          <p style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-            There are currently no AI models ingested or available in the system. Check back later after ingestion runs.
-          </p>
-        </div>
+      {modelRows.length === 0 ? (
+        <p style={{ color: '#666', fontStyle: 'italic', padding: '2rem 0' }}>
+          No models available.
+        </p>
       ) : (
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.95rem' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid #e5e7eb', backgroundColor: '#f9fafb' }}>
-                <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Name</th>
-                <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Provider</th>
-                <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Context Window</th>
-                <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Input ($/1M)</th>
-                <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Output ($/1M)</th>
-                <th style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Updated At</th>
+                <th style={{ padding: '0.75rem 1rem' }}>Provider</th>
+                <th style={{ padding: '0.75rem 1rem' }}>Name</th>
+                <th style={{ padding: '0.75rem 1rem' }}>Context Window</th>
+                <th style={{ padding: '0.75rem 1rem' }}>$/1M Input</th>
+                <th style={{ padding: '0.75rem 1rem' }}>$/1M Output</th>
+                <th style={{ padding: '0.75rem 1rem' }}>Updated At</th>
               </tr>
             </thead>
             <tbody>
-              {modelList.map((model) => (
-                <tr key={model.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                  <td style={{ padding: '0.75rem 1rem', fontWeight: 500 }}>{model.name}</td>
-                  <td style={{ padding: '0.75rem 1rem', color: '#4b5563' }}>{model.providerName}</td>
-                  <td style={{ padding: '0.75rem 1rem' }}>{model.contextWindow.toLocaleString()} tokens</td>
-                  <td style={{ padding: '0.75rem 1rem' }}>{formatPrice(model.inputPricePerM)}</td>
-                  <td style={{ padding: '0.75rem 1rem' }}>{formatPrice(model.outputPricePerM)}</td>
+              {modelRows.map((m) => (
+                <tr key={m.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                  <td style={{ padding: '0.75rem 1rem', fontWeight: 500 }}>{m.providerName}</td>
+                  <td style={{ padding: '0.75rem 1rem' }}>{m.name}</td>
+                  <td style={{ padding: '0.75rem 1rem' }}>{m.contextWindow.toLocaleString()} tokens</td>
+                  <td style={{ padding: '0.75rem 1rem' }}>${Number(m.inputPricePerM).toFixed(4)}</td>
+                  <td style={{ padding: '0.75rem 1rem' }}>${Number(m.outputPricePerM).toFixed(4)}</td>
                   <td style={{ padding: '0.75rem 1rem', color: '#6b7280', fontSize: '0.875rem' }}>
-                    {formatDate(model.updatedAt)}
+                    {new Date(m.updatedAt).toISOString().split('T')[0]}
                   </td>
                 </tr>
               ))}
@@ -112,6 +76,6 @@ export default async function ModelsPage() {
           </table>
         </div>
       )}
-    </div>
+    </main>
   );
 }
