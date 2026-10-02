@@ -200,10 +200,8 @@ async function seed() {
         modelId,
         capturedAt: new Date(),
         availability: 'available',
-        priceSnapshot: {
-          inputPricePerM: m.inputPricePerM,
-          outputPricePerM: m.outputPricePerM,
-        },
+        inputPricePerM: m.inputPricePerM,
+        outputPricePerM: m.outputPricePerM,
       });
       console.log(`Created snapshot for model: ${m.name}`);
     }
