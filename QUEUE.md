@@ -15,8 +15,7 @@ ticked in that item's own PR. Acceptance lines are the contract.
 - [x] q-0008 Availability field — models table gains last_seen_ok/last_seen_at/status derived from snapshots; index table shows a status dot (ok/degraded/unknown) — branch modelright/q-0008-availability-field
 - [x] q-0009 Site nav`+ footer — minimal header (logo, Models, Compare) and footer on all pages via layout — branch modelright/q-0009-site-nav-footer
 - [x] q-0010 llms.txt + robots.txt + sitemap.xml — static routes emitting them; metadata/OG tags on index + detail pages — branch modelright/q-0010-static-routes-metadata
-
-- [ ] q-0011 Landing page explains what modelright is — replace the skeleton placeholder ("Model-driven application skeleton / Next.js 14 • Drizzle ORM • PostgreSQL") on / with real positioning copy: what the site tracks (a live registry of AI model specs, context windows, and $/1M-token pricing), that entries update via the ingest feed + snapshots (explain freshness — the status dots), and clear entry points to /models and /compare. Keep it short — a lead paragraph, 3 supporting points, nav-forward CTA. The tech stack can stay as a footer note, not the headline.
+- [x] q-0011 Landing page explains what modelright is — replace the skeleton placeholder ("Model-driven application skeleton / Next.js 14 • Drizzle ORM • PostgreSQL") on / with real positioning copy: what the site tracks (a live registry of AI model specs, context windows, and $/1M-token pricing), that entries update via the ingest feed + snapshots (explain freshness — the status dots), and clear entry points to /models and /compare. Keep it short — a lead paragraph, 3 supporting points, nav-forward CTA. The tech stack can stay as a footer note, not the headline. — branch modelright/q-0011-landing-page
 
 ## Done
 
