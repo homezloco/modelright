@@ -6,10 +6,12 @@ import { eq, asc, desc } from 'drizzle-orm';
 export const dynamic = 'force-dynamic';
 
 interface ComparePageProps {
-  searchParams?: {
-    a?: string | string[];
-    b?: string | string[];
-    [key: string]: string | string[] | undefined;
+  searchParams?: Promise<{
+    a?: string;
+    b?: string;
+  }> | {
+    a?: string;
+    b?: string;
   };
 }
 
@@ -37,9 +39,10 @@ function parseModelParam(param?: string) {
   return { provider: provider.toLowerCase(), slug: slug.toLowerCase() };
 }
 
-export default async function ComparePage({ searchParams }: ComparePageProps) {
-  const paramA = Array.isArray(searchParams?.a) ? searchParams?.a[0] : searchParams?.a;
-  const paramB = Array.isArray(searchParams?.b) ? searchParams?.b[0] : searchParams?.b;
+export default async function ComparePage(props: ComparePageProps) {
+  const resolvedSearchParams = await Promise.resolve(props.searchParams);
+  const paramA = resolvedSearchParams?.a;
+  const paramB = resolvedSearchParams?.b;
 
   const modelAKey = parseModelParam(paramA);
   const modelBKey = parseModelParam(paramB);
@@ -145,8 +148,8 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
               </tr>
               <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
                 <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Slug</td>
-                <td style={{ padding: '0.75rem 1rem' }}>{modelA.providerSlug}/{modelA.slug}</td>
-                <td style={{ padding: '0.75rem 1rem' }}>{modelB.providerSlug}/{modelB.slug}</td>
+                <td style={{ padding: '0.75rem 1rem' }}>{modelA.slug}</td>
+                <td style={{ padding: '0.75rem 1rem' }}>{modelB.slug}</td>
               </tr>
               <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
                 <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Status</td>
@@ -154,13 +157,13 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
                   <span
                     style={{
                       display: 'inline-block',
-                      width: '10px',
-                      height: '10px',
+                      width: '8px',
+                      height: '8px',
                       borderRadius: '50%',
-                      marginRight: '0.5rem',
+                      marginRight: '6px',
                       backgroundColor:
                         modelA.status === 'ok'
-                          ? '#10b981'
+                          ? '#22c55e'
                           : modelA.status === 'degraded'
                           ? '#f59e0b'
                           : '#9ca3af',
@@ -172,13 +175,13 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
                   <span
                     style={{
                       display: 'inline-block',
-                      width: '10px',
-                      height: '10px',
+                      width: '8px',
+                      height: '8px',
                       borderRadius: '50%',
-                      marginRight: '0.5rem',
+                      marginRight: '6px',
                       backgroundColor:
                         modelB.status === 'ok'
-                          ? '#10b981'
+                          ? '#22c55e'
                           : modelB.status === 'degraded'
                           ? '#f59e0b'
                           : '#9ca3af',
