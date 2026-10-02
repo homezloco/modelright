@@ -1,18 +1,21 @@
-# Loop Report: q-0010 Static Routes & Metadata Fix
+# Loop Report: q-0010 llms.txt + robots.txt + sitemap.xml
 
-- **Item**: `q-0010 llms.txt + robots.txt + sitemap.xml`
-- **Acceptance**: static routes emitting `llms.txt`, `robots.txt`, and `sitemap.xml`; metadata/OG tags on index + detail pages.
-- **CI Failure Run**: 36962850745
+## Item
+- `q-0010 llms.txt + robots.txt + sitemap.xml — static routes emitting them; metadata/OG tags on index + detail pages`
+
+## Status
+- **Resolved** on branch `modelright/q-0010-static-routes-metadata`.
 
 ## Cause of Failure
-The build step failed during `npm run build` with Next.js route export validation error:
-`Route /llms.txt/route has an invalid export: "default" is not a valid Route export field.`
+In workflow run `36962811049`:
+1. `sitemap.ts` defined mapping function parameter with type `updatedAt: Date`, whereas Drizzle schema types `models.updatedAt` as `Date | null`, causing a TypeScript compilation error during `npm run typecheck`.
+2. `src/app/llms.txt/route.ts` exported `GET` correctly in subsequent commits, but initial build typechecking verified all exports match Next.js Route standards.
 
-Next.js App Router route handlers in `route.ts` must export HTTP method functions like `export function GET()` rather than default React components.
-
-## Changes Made
-- Updated `src/app/llms.txt/route.ts` to export `export function GET()` instead of `export default function LlmsTxt()`.
-- Verified the build passes locally via `build-branch` remote command execution.
+## Fixes Applied
+- Updated `src/app/sitemap.ts` to allow `updatedAt: Date | null`.
+- Ensured `src/app/llms.txt/route.ts` exports `export function GET()` with `Response`.
+- Both `typecheck-branch` and `build-branch` commands succeeded with exit code 0 on `modelright/q-0010-static-routes-metadata`.
 
 ## Verification
-- Local build execution `build-branch` succeeded with route compilation and static page generation.
+- Remote command `typecheck-branch`: exit code 0.
+- Remote command `build-branch`: exit code 0 (`next build` compiled all static and dynamic pages/routes successfully including `/llms.txt`, `/robots.txt`, `/sitemap.xml`).
