@@ -144,7 +144,7 @@ async function getModelData(providerSlug: string, modelSlug: string) {
       outputPricePerM: `$${Number(modelRec.outputPricePerM).toFixed(2)}`,
       modalityTags: modelRec.modalityTags || [],
       updatedAt: modelRec.updatedAt ? new Date(modelRec.updatedAt).toISOString() : '',
-      snapshots: snapshotRows.map((s) => ({
+      snapshots: snapshotRows.map((s: any) => ({
         id: s.id,
         capturedAt: new Date(s.capturedAt).toISOString().replace('T', ' ').substring(0, 19) + ' UTC',
         availability: s.availability,
@@ -213,7 +213,7 @@ export default async function ModelDetailPage({ params }: ModelDetailPageProps) 
         {model.modalityTags.length > 0 && (
           <div style={{ marginTop: '1rem' }}>
             <span style={{ fontSize: '0.85rem', color: '#666', marginRight: '0.5rem' }}>Modalities:</span>
-            {model.modalityTags.map((tag) => (
+            {model.modalityTags.map((tag: string) => (
               <span
                 key={tag}
                 style={{
@@ -249,7 +249,7 @@ export default async function ModelDetailPage({ params }: ModelDetailPageProps) 
               </tr>
             </thead>
             <tbody>
-              {model.snapshots.map((snap) => (
+              {model.snapshots.map((snap: any) => (
                 <tr key={snap.id} style={{ borderBottom: '1px solid #eee' }}>
                   <td style={{ padding: '0.5rem', fontFamily: 'monospace', fontSize: '0.9rem' }}>
                     {snap.capturedAt}
