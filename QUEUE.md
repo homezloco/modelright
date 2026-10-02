@@ -1,21 +1,11 @@
 # Queue
 
-The improvement loop works "## Open" top to bottom — one item per round,
-ticked in that item's own PR. Acceptance lines are the contract.
-
 ## Open
 
-- [ ] q-0001 Add package-lock.json — `npm install` on a clean checkout produces the lockfile; commit it
-- [ ] q-0002 Ingest schema — drizzle tables `providers`, `models` (provider fk, slug, context_window, input/output price per 1M, modality tags, timestamps), `ingest_log` (source, payload count, status, created_at), `model_snapshots` (model fk, captured_at, availability, price snapshot) in src/db/schema.ts; `npm run db:generate` produces the migration and it's committed
-- [ ] q-0003 Ingest endpoint — POST /api/ingest, Bearer-token auth via INGEST_TOKEN env (timing-safe compare, 401 otherwise), validates a normalized payload (zod), idempotent upserts by (provider, slug), appends ingest_log + model_snapshots rows; returns {received, upserted}
-- [ ] q-0004 Models index — GET /models renders a server-side table: name, provider, context window, $/1M in/out, updated_at; sorted by provider then name; empty state text when no rows
-- [ ] q-0005 Model detail — /models/[provider]/[slug] shows full record incl. last N snapshots and ingest provenance; 404 for unknown
-- [ ] q-0006 Seed fixtures — scripts/seed.ts inserting ~10 realistic models across 3 providers (OpenRouter, Anthropic, OpenAI) so pages render before live ingest; documented in README
-- [ ] q-0007 Compare view — /compare?a=provider/slug&b=provider/slug side-by-side spec/price table; bad or missing params render a picker instead of erroring
-- [ ] q-0008 Availability field — models table gains last_seen_ok/last_seen_at/status derived from snapshots; index table shows a status dot (ok/degraded/unknown)
-- [ ] q-0009 Site nav + footer — minimal header (logo, Models, Compare) and footer on all pages via layout
-- [ ] q-0010 llms.txt + robots.txt + sitemap.xml — static routes emitting them; metadata/OG tags on index + detail pages
+- [ ] q-0001 Add package-lock.json — first `npm install` on Railway generates it; commit to repo
+- [ ] q-0002 Database migrations on deploy — Railway build should run `npm run db:migrate` before starting
+- [ ] q-0003 Health check includes DB ping — `/health` route should verify database connectivity
 
 ## Done
 
-(Bootstrap skeleton pushed)
+(Completed items move here after merge)

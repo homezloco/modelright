@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
-import './globals.css';
 
 export const metadata: Metadata = {
   title: 'modelright',
-  description: 'Model-driven development platform',
+  description: 'Model-driven application',
 };
 
 export default function RootLayout({

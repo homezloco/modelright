@@ -1,20 +1,24 @@
-# Claude Agent Notes
+# Claude Notes
 
-You work on this repo through **GitHub MCP tools only** — no local filesystem.
+Guidance for agents iterating this repository.
 
-- **push_files** for new files or bulk changes
-- **edit_file** (preferred) for surgical edits to existing files
-- **read_file_range** for large files
+## Environment
 
-## Conventions
+- **GitHub-MCP-only**: All writes go through GitHub MCP tools (push_files, edit_file). No local filesystem.
+- **push_files**: Prefer for new files or wholesale rewrites.
+- **edit_file**: Strongly prefer for changing existing files — only edited fragments are sent.
+- **No local operations**: Do not assume you can read/write files locally.
 
-- **QUEUE.md** tracks work items in `q-NNNN` format under `## Open` and `## Done`
-- **PLAN.md** holds product direction; keep a single `## Now` section focused
-- Always commit with clear messages referencing queue items when applicable
+## Workflow conventions
 
-## Stack
+- **QUEUE.md**: Task list with `- [ ] q-NNNN <title> — <acceptance>` format.
+  - Open section: pending work
+  - Done section: completed items (moved after merge)
+- **PLAN.md**: Product planning document with Now/Next/Later sections.
 
-- Next.js 14 app router
-- TypeScript strict mode
-- Drizzle ORM + PostgreSQL
-- Deployed on Railway (DATABASE_URL injected)
+## Best practices
+
+1. Always fetch current file content before editing (get_file_contents or read_file_range).
+2. Use exact-string replacement with edit_file — matches must be EXACT.
+3. Run typecheck before submitting changes.
+4. Keep commits atomic and well-described.
