@@ -2,6 +2,12 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:16 -->
+## 2026-10-02 — q-0014 Pagination & filtering on models index
+[PR #16](https://github.com/homezloco/modelright/pull/16) · `modelright/q-0014-pagination-filtering` · 3 files · +312/-56 · $0.06
+
+Agent's note: [docs/loop-reports/2026-10-02-q-0014-pagination-filtering.md](docs/loop-reports/2026-10-02-q-0014-pagination-filtering.md)
+
 <!-- pr:15 -->
 ## 2026-10-02 — queue-refill-2026-10-02-v2 queue: refill with 5 new items (q-0014 through q-0018)
 [PR #15](https://github.com/homezloco/modelright/pull/15) · `modelright/queue-refill-2026-10-02-v2` · 1 file · +6/-0
