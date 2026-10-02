@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { db } from '@/db/client';
-import { providers, models, modelSnapshots, ingestLog } from '@/db/schema';
+import { providers, models, modelSnapshots } from '@/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
 
 interface ModelDetailPageProps {
@@ -150,7 +150,9 @@ async function getModelData(providerSlug: string, modelSlug: string) {
         availability: s.availability,
         inputPricePerM: `$${Number(s.inputPricePerM).toFixed(2)}`,
         outputPricePerM: `$${Number(s.outputPricePerM).toFixed(2)}`,
-        source: (s.rawPayload as any)?.source || 'Ingest pipeline',
+        source: typeof s.rawPayload === 'object' && s.rawPayload !== null && 'source' in s.rawPayload && typeof (s.rawPayload as Record<string, unknown>).source === 'string'
+          ? (s.rawPayload as Record<string, unknown>).source as string
+          : 'Ingest pipeline',
       })),
     };
   } catch (error) {
