@@ -176,7 +176,7 @@ export default async function ModelDetailPage({ params }: ModelDetailPageProps) 
       </div>
 
       <header style={{ marginBottom: '2rem', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>
-        <span style={{ fontSize: '0.9rem', color: '#666', textTransform: 'uppercase', tracking: '0.05em' }}>
+        <span style={{ fontSize: '0.9rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           {model.providerName}
         </span>
         <h1 style={{ fontSize: '2rem', marginTop: '0.25rem', marginBottom: '0.5rem' }}>{model.name}</h1>
