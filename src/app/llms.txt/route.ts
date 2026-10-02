@@ -1,6 +1,6 @@
 export const dynamic = 'force-static';
 
-export default function LlmsTxt() {
+export function GET() {
   const content = `# modelright
 
 > Modelright tracks AI model specifications, pricing, availability, and snapshots across providers.
