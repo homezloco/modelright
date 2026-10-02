@@ -279,7 +279,7 @@ export default async function ModelDetailPage({ params }: ModelDetailPageProps) 
 
       <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
         <Link
-          href={`/compare?a=${resolvedParams.provider}/${resolvedParams.slug}`}
+          href={`/compare?a=${params.provider}/${params.slug}`}
           style={{
             padding: '0.5rem 1rem',
             background: '#0066cc',
