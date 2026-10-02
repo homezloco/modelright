@@ -39,7 +39,10 @@ export default function RootLayout({
             <div>
               &copy; {new Date().getFullYear()} modelright. AI model specification &amp; pricing registry.
             </div>
-            <div>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <a href="https://livegraph.ai" target="_blank" rel="noopener noreferrer" style={{ color: '#64748b', textDecoration: 'none' }}>
+                Built with LiveGraph
+              </a>
               <a href="https://github.com/homezloco/modelright" target="_blank" rel="noopener noreferrer" style={{ color: '#64748b', textDecoration: 'none' }}>
                 GitHub
               </a>
