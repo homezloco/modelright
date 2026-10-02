@@ -21,6 +21,12 @@ ticked in that item's own PR. Acceptance lines are the contract.
 
 - [x] q-0013 Footer credits "Built with LiveGraph" — the site-wide footer (layout, q-0009) gains a "Built with LiveGraph" link to https://livegraph.ai alongside the copyright line — LiveGraph orchestrated this app's build and the credit is part of the bootstrap skeleton going forward; keep it quiet, same weight as the existing footer links — branch modelright/q-0013-footer-built-with-livegraph
 
+- [ ] q-0014 Pagination & filtering on models index — provider filter, price sort, pagination controls; URL params persist state — (ux) — acceptance: index page loads with ?provider=openai&sort=price_in&page=2 and renders correct subset
+- [ ] q-0015 Search endpoint & UI — GET /api/models/search?q=term returns matching models by name/provider; header search box debounced, results in dropdown — (ux) — acceptance: typing "gpt" in header search shows GPT-4o, GPT-4o-mini within 300ms
+- [ ] q-0016 Unit & integration tests — vitest suite covering ingest validation, idempotent upsert, models index/query, compare view; run in CI — (reliability) — acceptance: `npm run test` passes with >=80% line coverage on src/app/api and src/lib
+- [ ] q-0017 Dark mode toggle — header toggle persists choice in localStorage, respects prefers-color-scheme default; all pages styled — (ux) — acceptance: clicking toggle switches theme immediately and survives reload; no flash on load
+- [ ] q-0018 Rate limiting on /api/ingest — token-bucket per INGEST_TOKEN (configurable capacity/refill), returns 429 with Retry-After header when exceeded — (reliability) — acceptance: 11 rapid requests with same token yields one 429 and Retry-After header present
+
 ## Done
 
 (Bootstrap skeleton pushed)
