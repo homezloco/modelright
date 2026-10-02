@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import HeaderSearch from '@/components/HeaderSearch';
 
 export const metadata: Metadata = {
   title: 'modelright',
@@ -15,18 +16,21 @@ export default function RootLayout({
     <html lang="en">
       <body style={{ margin: 0, fontFamily: 'system-ui, -apple-system, sans-serif', backgroundColor: '#0f172a', color: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <header style={{ borderBottom: '1px solid #1e293b', backgroundColor: '#0f172a', padding: '1rem 2rem' }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Link href="/models" style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#38bdf8', textDecoration: 'none' }}>
-              modelright
-            </Link>
-            <nav style={{ display: 'flex', gap: '1.5rem' }}>
-              <Link href="/models" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 500 }}>
-                Models
+          <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+              <Link href="/models" style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#38bdf8', textDecoration: 'none' }}>
+                modelright
               </Link>
-              <Link href="/compare" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 500 }}>
-                Compare
-              </Link>
-            </nav>
+              <nav style={{ display: 'flex', gap: '1.5rem' }}>
+                <Link href="/models" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 500 }}>
+                  Models
+                </Link>
+                <Link href="/compare" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 500 }}>
+                  Compare
+                </Link>
+              </nav>
+            </div>
+            <HeaderSearch />
           </div>
         </header>
 
