@@ -21,7 +21,13 @@ Model-driven application with Next.js, Drizzle ORM, and PostgreSQL.
    npm run db:migrate
    ```
 
-4. **Start development server**
+4. **Seed sample model fixtures**
+   ```bash
+   npm run db:seed
+   ```
+   Inserts realistic model specs and initial snapshot records across OpenAI, Anthropic, and OpenRouter providers so pages render before live ingestion runs.
+
+5. **Start development server**
    ```bash
    npm run dev
    ```
@@ -43,3 +49,4 @@ Model-driven application with Next.js, Drizzle ORM, and PostgreSQL.
 - `npm run typecheck` — check TypeScript
 - `npm run db:generate` — generate migrations from schema
 - `npm run db:migrate` — apply migrations to database
+- `npm run db:seed` — seed fixture models, providers, and snapshots
