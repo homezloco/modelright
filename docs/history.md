@@ -2,6 +2,12 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:14 -->
+## 2026-10-02 — q-0012 Compare page reads real models
+[PR #14](https://github.com/homezloco/modelright/pull/14) · `modelright/q-0012-compare-page-reads-db` · 3 files · +179/-77 · $0.35
+
+Agent's note: [docs/loop-reports/2026-10-02-q-0012-compare-page-reads-db.md](docs/loop-reports/2026-10-02-q-0012-compare-page-reads-db.md)
+
 <!-- pr:12 -->
 ## 2026-10-02 — q-0011 Landing page explains what modelright is
 [PR #12](https://github.com/homezloco/modelright/pull/12) · `modelright/q-0011-landing-page` · 2 files · +19/-17 · $0.21
