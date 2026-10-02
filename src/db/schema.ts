@@ -17,6 +17,9 @@ export const models = pgTable('models', {
   inputPricePerM: numeric('input_price_per_m', { precision: 12, scale: 6 }).notNull(),
   outputPricePerM: numeric('output_price_per_m', { precision: 12, scale: 6 }).notNull(),
   modalityTags: jsonb('modality_tags').$type<string[]>().default([]).notNull(),
+  lastSeenOk: timestamp('last_seen_ok'),
+  lastSeenAt: timestamp('last_seen_at'),
+  status: text('status').default('unknown').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => {

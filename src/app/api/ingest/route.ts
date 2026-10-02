@@ -101,6 +101,10 @@ export async function POST(req: Request) {
         ),
       });
 
+      const now = new Date();
+      const isOk = item.availability === 'available' || item.availability === 'ok';
+      const newStatus = isOk ? 'ok' : item.availability ? 'degraded' : 'unknown';
+
       if (modelRecord) {
         const [updatedModel] = await db
           .update(models)
@@ -110,7 +114,10 @@ export async function POST(req: Request) {
             inputPricePerM: inputPriceStr,
             outputPricePerM: outputPriceStr,
             modalityTags: item.modalityTags,
-            updatedAt: new Date(),
+            lastSeenAt: now,
+            ...(isOk ? { lastSeenOk: now } : {}),
+            status: newStatus,
+            updatedAt: now,
           })
           .where(eq(models.id, modelRecord.id))
           .returning();
@@ -126,6 +133,9 @@ export async function POST(req: Request) {
             inputPricePerM: inputPriceStr,
             outputPricePerM: outputPriceStr,
             modalityTags: item.modalityTags,
+            lastSeenAt: now,
+            ...(isOk ? { lastSeenOk: now } : {}),
+            status: newStatus,
           })
           .returning();
         modelRecord = insertedModel;

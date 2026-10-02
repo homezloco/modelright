@@ -11,6 +11,7 @@ export default async function ModelsPage() {
     contextWindow: number;
     inputPricePerM: string;
     outputPricePerM: string;
+    status: string;
     updatedAt: Date;
     providerName: string;
     providerSlug: string;
@@ -24,6 +25,7 @@ export default async function ModelsPage() {
         contextWindow: models.contextWindow,
         inputPricePerM: models.inputPricePerM,
         outputPricePerM: models.outputPricePerM,
+        status: models.status,
         updatedAt: models.updatedAt,
         providerName: providers.name,
         providerSlug: providers.slug,
@@ -51,6 +53,7 @@ export default async function ModelsPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid #e5e7eb', backgroundColor: '#f9fafb' }}>
+                <th style={{ padding: '0.75rem 1rem' }}>Status</th>
                 <th style={{ padding: '0.75rem 1rem' }}>Provider</th>
                 <th style={{ padding: '0.75rem 1rem' }}>Name</th>
                 <th style={{ padding: '0.75rem 1rem' }}>Context Window</th>
@@ -60,18 +63,39 @@ export default async function ModelsPage() {
               </tr>
             </thead>
             <tbody>
-              {modelRows.map((m) => (
-                <tr key={m.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                  <td style={{ padding: '0.75rem 1rem', fontWeight: 500 }}>{m.providerName}</td>
-                  <td style={{ padding: '0.75rem 1rem' }}>{m.name}</td>
-                  <td style={{ padding: '0.75rem 1rem' }}>{m.contextWindow.toLocaleString()} tokens</td>
-                  <td style={{ padding: '0.75rem 1rem' }}>${Number(m.inputPricePerM).toFixed(4)}</td>
-                  <td style={{ padding: '0.75rem 1rem' }}>${Number(m.outputPricePerM).toFixed(4)}</td>
-                  <td style={{ padding: '0.75rem 1rem', color: '#6b7280', fontSize: '0.875rem' }}>
-                    {new Date(m.updatedAt).toISOString().split('T')[0]}
-                  </td>
-                </tr>
-              ))}
+              {modelRows.map((m) => {
+                const statusColor =
+                  m.status === 'ok'
+                    ? '#10b981'
+                    : m.status === 'degraded'
+                    ? '#f59e0b'
+                    : '#9ca3af';
+
+                return (
+                  <tr key={m.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                    <td style={{ padding: '0.75rem 1rem' }}>
+                      <span
+                        title={m.status}
+                        style={{
+                          display: 'inline-block',
+                          width: '10px',
+                          height: '10px',
+                          borderRadius: '50%',
+                          backgroundColor: statusColor,
+                        }}
+                      />
+                    </td>
+                    <td style={{ padding: '0.75rem 1rem', fontWeight: 500 }}>{m.providerName}</td>
+                    <td style={{ padding: '0.75rem 1rem' }}>{m.name}</td>
+                    <td style={{ padding: '0.75rem 1rem' }}>{m.contextWindow.toLocaleString()} tokens</td>
+                    <td style={{ padding: '0.75rem 1rem' }}>${Number(m.inputPricePerM).toFixed(4)}</td>
+                    <td style={{ padding: '0.75rem 1rem' }}>${Number(m.outputPricePerM).toFixed(4)}</td>
+                    <td style={{ padding: '0.75rem 1rem', color: '#6b7280', fontSize: '0.875rem' }}>
+                      {new Date(m.updatedAt).toISOString().split('T')[0]}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
