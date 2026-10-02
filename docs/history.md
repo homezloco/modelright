@@ -2,6 +2,12 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:17 -->
+## 2026-10-02 — q-0015 Search endpoint & UI
+[PR #17](https://github.com/homezloco/modelright/pull/17) · `modelright/q-0015-search-endpoint-ui` · 5 files · +231/-12 · $0.05
+
+Agent's note: [docs/loop-reports/2026-10-02-q-0015-search-endpoint-ui.md](docs/loop-reports/2026-10-02-q-0015-search-endpoint-ui.md)
+
 <!-- pr:16 -->
 ## 2026-10-02 — q-0014 Pagination & filtering on models index
 [PR #16](https://github.com/homezloco/modelright/pull/16) · `modelright/q-0014-pagination-filtering` · 3 files · +312/-56 · $0.06
