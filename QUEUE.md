@@ -20,6 +20,8 @@ ticked in that item's own PR. Acceptance lines are the contract.
 
 - [ ] q-0012 Compare page reads real models — /compare renders a hardcoded 3-entry SAMPLE_MODELS array and never queries the DB; replace it with a server-side select of models joined to providers (same shape as /models index). The ?a=provider/slug&b=provider/slug picker resolves against DB rows — unknown slugs show the picker with an explanatory note, valid pairs show the side-by-side table (context window, $/1M in/out, modalities, availability status, last snapshot date). Preset links may stay but must reference real seeded slugs. This was "the placeholder you forgot to remove" — /models has 10 real rows while /compare shows 3 fake ones with invented pricing.
 
+- [ ] q-0013 Footer credits "Built with LiveGraph" — the site-wide footer (layout, q-0009) gains a "Built with LiveGraph" link to https://livegraph.ai alongside the copyright line — LiveGraph orchestrated this app's build and the credit is part of the bootstrap skeleton going forward; keep it quiet, same weight as the existing footer links
+
 ## Done
 
 (Bootstrap skeleton pushed)
