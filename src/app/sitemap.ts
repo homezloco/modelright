@@ -41,7 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .from(models)
       .innerJoin(providers, eq(models.providerId, providers.id));
 
-    modelRoutes = modelList.map((m: { providerSlug: string; modelSlug: string; updatedAt: Date }) => ({
+    modelRoutes = modelList.map((m: { providerSlug: string; modelSlug: string; updatedAt: Date | null }) => ({
       url: `${baseUrl}/models/${m.providerSlug}/${m.modelSlug}`,
       lastModified: m.updatedAt ? new Date(m.updatedAt) : new Date(),
       changeFrequency: 'daily',
