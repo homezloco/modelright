@@ -59,7 +59,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
       .innerJoin(providers, eq(models.providerId, providers.id))
       .orderBy(asc(providers.name), asc(models.name));
 
-    allModels = results.map((r) => ({
+    allModels = results.map((r: ModelItem) => ({
       ...r,
       modalityTags: r.modalityTags || [],
     }));
@@ -72,7 +72,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
 
   const modelA = modelAKey
     ? allModels.find(
-        (m) =>
+        (m: ModelItem) =>
           m.providerSlug.toLowerCase() === modelAKey.provider &&
           m.slug.toLowerCase() === modelAKey.slug
       )
@@ -80,7 +80,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
 
   const modelB = modelBKey
     ? allModels.find(
-        (m) =>
+        (m: ModelItem) =>
           m.providerSlug.toLowerCase() === modelBKey.provider &&
           m.slug.toLowerCase() === modelBKey.slug
       )
