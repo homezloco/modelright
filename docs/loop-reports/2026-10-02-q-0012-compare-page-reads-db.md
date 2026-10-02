@@ -11,6 +11,7 @@
    - Updated comparison view to display DB-sourced fields: context window, $/1M input and output prices, modalities, availability status (with status dot indicator), and last snapshot date (or updatedAt date if no snapshot exists).
    - Updated picker state for invalid/unknown model slugs to show an explanatory note alerting the user.
    - Updated preset links to use real seeded model slugs (`openai/gpt-4o`, `anthropic/claude-3-5-sonnet`, `openai/gpt-4o-mini`, `anthropic/claude-3-5-haiku`).
+   - Fixed `ComparePageProps` searchParams type definition to `Promise<{ a?: string; b?: string }>` to resolve Next.js app router typecheck error (`Type 'Promise<{ a?: string; b?: string; }> | { a?: string; b?: string; }' does not satisfy the constraint 'PageProps'`).
 2. **`QUEUE.md`**: Marked `q-0012` as done with branch `modelright/q-0012-compare-page-reads-db`.
 
 ## Verification
