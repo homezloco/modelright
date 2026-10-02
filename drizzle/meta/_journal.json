@@ -8,6 +8,13 @@
       "when": 1727825734000,
       "tag": "0000_ingest_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1727838000000,
+      "tag": "0001_availability_fields",
+      "breakpoints": true
     }
   ]
 }
