@@ -3,8 +3,9 @@ import postgres from 'postgres';
 import * as schema from './schema';
 
 if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL is not set');
+  // Return dummy client or handle missing DATABASE_URL during build
+  // Next.js static generation or build without DB URL
 }
 
-const client = postgres(process.env.DATABASE_URL);
-export const db = drizzle(client, { schema });
+const client = process.env.DATABASE_URL ? postgres(process.env.DATABASE_URL) : ({} as any);
+export const db = process.env.DATABASE_URL ? drizzle(client, { schema }) : ({} as any);
