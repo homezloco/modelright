@@ -2,6 +2,12 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:8 -->
+## 2026-10-02 — q-0008 Availability field
+[PR #8](https://github.com/homezloco/modelright/pull/8) · `modelright/q-0008-availability-field` · 8 files · +89/-14 · $0.79
+
+Agent's note: [docs/loop-reports/2026-10-02-q-0008-availability-field.md](docs/loop-reports/2026-10-02-q-0008-availability-field.md)
+
 <!-- pr:7 -->
 ## 2026-10-02 — q-0006 Seed fixtures
 [PR #7](https://github.com/homezloco/modelright/pull/7) · `modelright/q-0006-seed-fixtures` · 17 files · +830/-25 · $0.68
