@@ -7,7 +7,7 @@ ticked in that item's own PR. Acceptance lines are the contract.
 
 - [x] q-0001 Add package-lock.json
 - [x] q-0002 Ingest schema — drizzle tables `providers`, `models` (provider fk, slug, context_window, input/output price per 1M, modality tags, timestamps), `ingest_log` (source, payload count, status, created_at), `model_snapshots` (model fk, captured_at, availability, price snapshot) in src/db/schema.ts; `npm run db:generate` produces the migration and it's committed — branch modelright/q-0002-ingest-schema
-- [ ] q-0003 Ingest endpoint — POST /api/ingest, Bearer-token auth via INGEST_TOKEN env (timing-safe compare, 401 otherwise), validates a normalized payload (zod), idempotent upserts by (provider, slug), appends ingest_log + model_snapshots rows; returns {received, upserted}
+- [x] q-0003 Ingest endpoint — POST /api/ingest, Bearer-token auth via INGEST_TOKEN env (timing-safe compare, 401 otherwise), validates a normalized payload (zod), idempotent upserts by (provider, slug), appends ingest_log + model_snapshots rows; returns {received, upserted} — branch modelright/q-0003-ingest-endpoint
 - [x] q-0004 Models index — GET /models renders a server-side table: name, provider, context window, $/1M in/out, updated_at; sorted by provider then name; empty state text when no rows — branch modelright/q-0004-models-index
 - [ ] q-0005 Model detail — /models/[provider]/[slug] shows full record incl. last N snapshots and ingest provenance; 404 for unknown
 - [ ] q-0006 Seed fixtures — scripts/seed.ts inserting ~10 realistic models across 3 providers (OpenRouter, Anthropic, OpenAI) so pages render before live ingest; documented in README
