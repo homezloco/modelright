@@ -9,10 +9,7 @@ interface ComparePageProps {
   searchParams?: Promise<{
     a?: string;
     b?: string;
-  }> | {
-    a?: string;
-    b?: string;
-  };
+  }>;
 }
 
 interface DBModelItem {
