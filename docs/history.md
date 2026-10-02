@@ -2,6 +2,12 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:12 -->
+## 2026-10-02 — q-0011 Landing page explains what modelright is
+[PR #12](https://github.com/homezloco/modelright/pull/12) · `modelright/q-0011-landing-page` · 2 files · +19/-17 · $0.21
+
+Agent's note: [docs/loop-reports/2026-10-02-q-0011-landing-page.md](docs/loop-reports/2026-10-02-q-0011-landing-page.md)
+
 <!-- pr:13 -->
 ## 2026-10-02 — q-0013 Footer credits "Built with LiveGraph"
 [PR #13](https://github.com/homezloco/modelright/pull/13) · `modelright/q-0013-footer-built-with-livegraph` · 3 files · +24/-2 · $0.16
