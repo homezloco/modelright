@@ -2,6 +2,10 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:15 -->
+## 2026-10-02 — queue-refill-2026-10-02-v2 queue: refill with 5 new items (q-0014 through q-0018)
+[PR #15](https://github.com/homezloco/modelright/pull/15) · `modelright/queue-refill-2026-10-02-v2` · 1 file · +6/-0
+
 <!-- pr:14 -->
 ## 2026-10-02 — q-0012 Compare page reads real models
 [PR #14](https://github.com/homezloco/modelright/pull/14) · `modelright/q-0012-compare-page-reads-db` · 3 files · +179/-77 · $0.35
