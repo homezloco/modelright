@@ -14,7 +14,7 @@ export interface ModelRow {
   updatedAt: Date;
 }
 
-export async function getModels(): Promise<ModelRow[]> {
+async function getModels(): Promise<ModelRow[]> {
   try {
     const rows = await db
       .select({
