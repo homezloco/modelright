@@ -21,8 +21,6 @@ ticked in that item's own PR. Acceptance lines are the contract.
 
 - [x] q-0013 Footer credits "Built with LiveGraph" — the site-wide footer (layout, q-0009) gains a "Built with LiveGraph" link to https://livegraph.ai alongside the copyright line — LiveGraph orchestrated this app's build and the credit is part of the bootstrap skeleton going forward; keep it quiet, same weight as the existing footer links — branch modelright/q-0013-footer-built-with-livegraph
 
-- [x] q-0013 Footer credits "Built with LiveGraph" — the site-wide footer (layout, q-0009) gains a "Built with LiveGraph" link to https://livegraph.ai alongside the copyright line — LiveGraph orchestrated this app's build and the credit is part of the bootstrap skeleton going forward; keep it quiet, same weight as the existing footer links — branch modelright/q-0013-footer-built-with-livegraph
-
 ## Done
 
 (Bootstrap skeleton pushed)
