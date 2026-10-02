@@ -13,4 +13,6 @@
 6. Ticked `q-0010` in `QUEUE.md`.
 
 ## Verification
-- Local build / typecheck will run via CI on push.
+- Remote command `build-branch` executed and verified `npm run build` succeeds cleanly.
+- Verified Next.js route compilation where `/llms.txt`, `/robots.txt`, and `/sitemap.xml` are built properly without error.
+
