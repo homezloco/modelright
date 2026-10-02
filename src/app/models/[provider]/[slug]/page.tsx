@@ -5,10 +5,10 @@ import { providers, models, modelSnapshots, ingestLog } from '@/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
 
 interface ModelDetailPageProps {
-  params: {
+  params: Promise<{
     provider: string;
     slug: string;
-  };
+  }>;
 }
 
 // Fallback sample models used when DB has not been seeded yet
@@ -161,7 +161,8 @@ async function getModelData(providerSlug: string, modelSlug: string) {
 }
 
 export default async function ModelDetailPage({ params }: ModelDetailPageProps) {
-  const model = await getModelData(params.provider, params.slug);
+  const resolvedParams = await params;
+  const model = await getModelData(resolvedParams.provider, resolvedParams.slug);
 
   if (!model) {
     notFound();
@@ -181,7 +182,7 @@ export default async function ModelDetailPage({ params }: ModelDetailPageProps) 
         </span>
         <h1 style={{ fontSize: '2rem', marginTop: '0.25rem', marginBottom: '0.5rem' }}>{model.name}</h1>
         <p style={{ color: '#555', fontFamily: 'monospace' }}>
-          {params.provider}/{params.slug}
+          {resolvedParams.provider}/{resolvedParams.slug}
         </p>
       </header>
 
