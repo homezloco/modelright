@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <main style={{ maxWidth: '800px', margin: '0 auto', padding: '3rem 1.5rem', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <section style={{ marginBottom: '3rem', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem', tracking: '-0.02em' }}>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem', letterSpacing: '-0.02em' }}>
           Real-time AI Model Specs, Context Windows & Pricing
         </h1>
         <p style={{ fontSize: '1.2rem', color: '#4a5568', lineHeight: 1.6, maxWidth: '650px', margin: '0 auto 2rem' }}>
