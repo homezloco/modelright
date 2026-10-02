@@ -1,5 +1,5 @@
 import { eq, asc } from 'drizzle-orm';
-import { db } from '@/db';
+import { db } from '@/db/client';
 import { models, providers } from '@/db/schema';
 
 export interface ModelRow {
@@ -72,7 +72,7 @@ export default async function ModelsPage() {
             padding: '3rem 1.5rem',
             textAlign: 'center',
             backgroundColor: '#f9fafb',
-            border: '1px border #e5e7eb',
+            border: '1px solid #e5e7eb',
             borderRadius: '8px',
             color: '#4b5563',
           }}
