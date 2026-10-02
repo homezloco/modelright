@@ -1,30 +1,30 @@
 import Link from 'next/link';
 import { db } from '@/db/client';
-import { models, providers, modelSnapshots } from '@/db/schema';
-import { eq, asc, desc } from 'drizzle-orm';
+import { models, providers } from '@/db/schema';
+import { eq, asc } from 'drizzle-orm';
 
 export const dynamic = 'force-dynamic';
 
 interface ComparePageProps {
-  searchParams?: Promise<{
+  searchParams: {
     a?: string;
     b?: string;
-  }>;
+  };
 }
 
-interface DBModelItem {
+interface ModelItem {
   id: string;
-  providerSlug: string;
-  providerName: string;
-  slug: string;
   name: string;
   contextWindow: number;
   inputPricePerM: string;
   outputPricePerM: string;
   modalityTags: string[];
   status: string;
+  lastSeenAt: Date | null;
   updatedAt: Date;
-  lastSnapshotDate: Date | null;
+  providerName: string;
+  providerSlug: string;
+  slug: string;
 }
 
 function parseModelParam(param?: string) {
@@ -36,58 +36,39 @@ function parseModelParam(param?: string) {
   return { provider: provider.toLowerCase(), slug: slug.toLowerCase() };
 }
 
-export default async function ComparePage(props: ComparePageProps) {
-  const resolvedSearchParams = await Promise.resolve(props.searchParams);
-  const paramA = resolvedSearchParams?.a;
-  const paramB = resolvedSearchParams?.b;
-
-  const modelAKey = parseModelParam(paramA);
-  const modelBKey = parseModelParam(paramB);
-
-  let allModels: DBModelItem[] = [];
+export default async function ComparePage({ searchParams }: ComparePageProps) {
+  let allModels: ModelItem[] = [];
 
   try {
     const results = await db
       .select({
         id: models.id,
-        providerSlug: providers.slug,
-        providerName: providers.name,
-        slug: models.slug,
         name: models.name,
         contextWindow: models.contextWindow,
         inputPricePerM: models.inputPricePerM,
         outputPricePerM: models.outputPricePerM,
         modalityTags: models.modalityTags,
         status: models.status,
+        lastSeenAt: models.lastSeenAt,
         updatedAt: models.updatedAt,
+        providerName: providers.name,
+        providerSlug: providers.slug,
+        slug: models.slug,
       })
       .from(models)
       .innerJoin(providers, eq(models.providerId, providers.id))
       .orderBy(asc(providers.name), asc(models.name));
 
-    // Fetch latest snapshot dates for each model
-    const snapshotsList = await db
-      .select({
-        modelId: modelSnapshots.modelId,
-        capturedAt: modelSnapshots.capturedAt,
-      })
-      .from(modelSnapshots)
-      .orderBy(desc(modelSnapshots.capturedAt));
-
-    const latestSnapshotMap = new Map<string, Date>();
-    for (const snap of snapshotsList) {
-      if (!latestSnapshotMap.has(snap.modelId)) {
-        latestSnapshotMap.set(snap.modelId, snap.capturedAt);
-      }
-    }
-
-    allModels = results.map((m) => ({
-      ...m,
-      lastSnapshotDate: latestSnapshotMap.get(m.id) || null,
+    allModels = results.map((r) => ({
+      ...r,
+      modalityTags: r.modalityTags || [],
     }));
   } catch (error) {
     console.error('Failed to load models for compare page:', error);
   }
+
+  const modelAKey = parseModelParam(searchParams.a);
+  const modelBKey = parseModelParam(searchParams.b);
 
   const modelA = modelAKey
     ? allModels.find(
@@ -106,13 +87,12 @@ export default async function ComparePage(props: ComparePageProps) {
     : null;
 
   const showComparison = modelA && modelB;
-  const isInvalidSelection = Boolean((paramA || paramB) && !showComparison);
 
   return (
     <main style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif', maxWidth: '900px', margin: '0 auto' }}>
       <h1>Compare Models</h1>
       <p style={{ color: '#666', marginBottom: '2rem' }}>
-        Compare specifications, pricing, and capabilities side-by-side.
+        Compare specifications, pricing, and capabilities side-by-side across AI model providers.
       </p>
 
       {showComparison ? (
@@ -149,45 +129,6 @@ export default async function ComparePage(props: ComparePageProps) {
                 <td style={{ padding: '0.75rem 1rem' }}>{modelB.slug}</td>
               </tr>
               <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
-                <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Status</td>
-                <td style={{ padding: '0.75rem 1rem' }}>
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      marginRight: '6px',
-                      backgroundColor:
-                        modelA.status === 'ok'
-                          ? '#22c55e'
-                          : modelA.status === 'degraded'
-                          ? '#f59e0b'
-                          : '#9ca3af',
-                    }}
-                  />
-                  {modelA.status}
-                </td>
-                <td style={{ padding: '0.75rem 1rem' }}>
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      marginRight: '6px',
-                      backgroundColor:
-                        modelB.status === 'ok'
-                          ? '#22c55e'
-                          : modelB.status === 'degraded'
-                          ? '#f59e0b'
-                          : '#9ca3af',
-                    }}
-                  />
-                  {modelB.status}
-                </td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
                 <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Context Window</td>
                 <td style={{ padding: '0.75rem 1rem' }}>{modelA.contextWindow.toLocaleString()} tokens</td>
                 <td style={{ padding: '0.75rem 1rem' }}>{modelB.contextWindow.toLocaleString()} tokens</td>
@@ -204,27 +145,58 @@ export default async function ComparePage(props: ComparePageProps) {
               </tr>
               <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
                 <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Modalities</td>
+                <td style={{ padding: '0.75rem 1rem' }}>{modelA.modalityTags.length > 0 ? modelA.modalityTags.join(', ') : 'text'}</td>
+                <td style={{ padding: '0.75rem 1rem' }}>{modelB.modalityTags.length > 0 ? modelB.modalityTags.join(', ') : 'text'}</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Availability Status</td>
                 <td style={{ padding: '0.75rem 1rem' }}>
-                  {Array.isArray(modelA.modalityTags) && modelA.modalityTags.length > 0
-                    ? modelA.modalityTags.join(', ')
-                    : 'N/A'}
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      marginRight: '0.5rem',
+                      backgroundColor:
+                        modelA.status === 'ok'
+                          ? '#10b981'
+                          : modelA.status === 'degraded'
+                          ? '#f59e0b'
+                          : '#9ca3af',
+                    }}
+                  />
+                  {modelA.status}
                 </td>
                 <td style={{ padding: '0.75rem 1rem' }}>
-                  {Array.isArray(modelB.modalityTags) && modelB.modalityTags.length > 0
-                    ? modelB.modalityTags.join(', ')
-                    : 'N/A'}
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      marginRight: '0.5rem',
+                      backgroundColor:
+                        modelB.status === 'ok'
+                          ? '#10b981'
+                          : modelB.status === 'degraded'
+                          ? '#f59e0b'
+                          : '#9ca3af',
+                    }}
+                  />
+                  {modelB.status}
                 </td>
               </tr>
               <tr>
                 <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Last Snapshot Date</td>
-                <td style={{ padding: '0.75rem 1rem', color: '#6b7280', fontSize: '0.875rem' }}>
-                  {modelA.lastSnapshotDate
-                    ? new Date(modelA.lastSnapshotDate).toISOString().split('T')[0]
+                <td style={{ padding: '0.75rem 1rem' }}>
+                  {modelA.lastSeenAt
+                    ? new Date(modelA.lastSeenAt).toISOString().split('T')[0]
                     : new Date(modelA.updatedAt).toISOString().split('T')[0]}
                 </td>
-                <td style={{ padding: '0.75rem 1rem', color: '#6b7280', fontSize: '0.875rem' }}>
-                  {modelB.lastSnapshotDate
-                    ? new Date(modelB.lastSnapshotDate).toISOString().split('T')[0]
+                <td style={{ padding: '0.75rem 1rem' }}>
+                  {modelB.lastSeenAt
+                    ? new Date(modelB.lastSeenAt).toISOString().split('T')[0]
                     : new Date(modelB.updatedAt).toISOString().split('T')[0]}
                 </td>
               </tr>
@@ -234,46 +206,49 @@ export default async function ComparePage(props: ComparePageProps) {
       ) : (
         <div style={{ backgroundColor: '#f9fafb', padding: '1.5rem', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
           <h2 style={{ marginTop: 0, fontSize: '1.25rem' }}>Select Models to Compare</h2>
-          {isInvalidSelection ? (
-            <p style={{ color: '#dc2626', fontSize: '0.9rem', marginBottom: '1rem', fontWeight: 500 }}>
-              One or both selected models could not be found. Please choose two valid models from the options below.
-            </p>
-          ) : (
-            <p style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: '1rem' }}>
-              Please select two valid models from the available options below to view a side-by-side comparison.
+          {(searchParams.a || searchParams.b) && (!modelA || !modelB) && (
+            <p style={{ color: '#d97706', fontSize: '0.9rem', marginBottom: '1rem' }}>
+              One or both requested models could not be found in the database. Please pick valid models from below.
             </p>
           )}
 
-          <div style={{ marginTop: '1.5rem' }}>
-            <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Preset Comparisons</h3>
-            <ul style={{ paddingLeft: '1.25rem', lineHeight: '1.8' }}>
-              <li>
-                <Link href="/compare?a=openai/gpt-4o&b=anthropic/claude-3-5-sonnet" style={{ color: '#0066cc' }}>
-                  OpenAI GPT-4o vs Anthropic Claude 3.5 Sonnet
-                </Link>
-              </li>
-              <li>
-                <Link href="/compare?a=openai/gpt-4o-mini&b=anthropic/claude-3-5-haiku" style={{ color: '#0066cc' }}>
-                  OpenAI GPT-4o mini vs Anthropic Claude 3.5 Haiku
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {allModels.length > 0 && (
+            <div style={{ marginTop: '1.5rem' }}>
+              <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Preset Comparisons</h3>
+              <ul style={{ paddingLeft: '1.25rem', lineHeight: '1.8' }}>
+                {allModels.length >= 2 && (
+                  <li>
+                    <Link
+                      href={`/compare?a=${allModels[0].providerSlug}/${allModels[0].slug}&b=${allModels[1].providerSlug}/${allModels[1].slug}`}
+                      style={{ color: '#0066cc' }}
+                    >
+                      {allModels[0].providerName} {allModels[0].name} vs {allModels[1].providerName} {allModels[1].name}
+                    </Link>
+                  </li>
+                )}
+                {allModels.length >= 3 && (
+                  <li>
+                    <Link
+                      href={`/compare?a=${allModels[0].providerSlug}/${allModels[0].slug}&b=${allModels[2].providerSlug}/${allModels[2].slug}`}
+                      style={{ color: '#0066cc' }}
+                    >
+                      {allModels[0].providerName} {allModels[0].name} vs {allModels[2].providerName} {allModels[2].name}
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            </div>
+          )}
 
           <div style={{ marginTop: '1.5rem' }}>
             <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Available Models</h3>
             {allModels.length === 0 ? (
-              <p style={{ color: '#666', fontStyle: 'italic' }}>No models found in database.</p>
+              <p style={{ color: '#666', fontStyle: 'italic' }}>No models available in the database.</p>
             ) : (
               <ul style={{ paddingLeft: '1.25rem', lineHeight: '1.6' }}>
                 {allModels.map((model) => (
                   <li key={model.id}>
-                    <Link
-                      href={`/compare?a=${modelAKey ? `${modelAKey.provider}/${modelAKey.slug}` : `${model.providerSlug}/${model.slug}`}&b=${modelAKey ? `${model.providerSlug}/${model.slug}` : ''}`}
-                      style={{ color: '#0066cc', textDecoration: 'none' }}
-                    >
-                      <strong>{model.name}</strong> ({model.providerName}/{model.slug})
-                    </Link>
+                    <strong>{model.name}</strong> ({model.providerName}/{model.slug})
                   </li>
                 ))}
               </ul>
