@@ -13,7 +13,7 @@ ticked in that item's own PR. Acceptance lines are the contract.
 - [ ] q-0006 Seed fixtures — scripts/seed.ts inserting ~10 realistic models across 3 providers (OpenRouter, Anthropic, OpenAI) so pages render before live ingest; documented in README
 - [x] q-0007 Compare view — /compare?a=provider/slug&b=provider/slug side-by-side spec/price table; bad or missing params render a picker instead of erroring — branch modelright/q-0007-compare-view
 - [ ] q-0008 Availability field — models table gains last_seen_ok/last_seen_at/status derived from snapshots; index table shows a status dot (ok/degraded/unknown)
-- [ ] q-0009 Site nav + footer — minimal header (logo, Models, Compare) and footer on all pages via layout
+- [x] q-0009 Site nav + footer — minimal header (logo, Models, Compare) and footer on all pages via layout — branch modelright/q-0009-site-nav-footer
 - [ ] q-0010 llms.txt + robots.txt + sitemap.xml — static routes emitting them; metadata/OG tags on index + detail pages
 
 ## Done
