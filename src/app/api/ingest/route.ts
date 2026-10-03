@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { db } from '@/db/client';
 import { providers, models, ingestLog, modelSnapshots } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 const modelItemSchema = z.object({
   provider: z.object({
@@ -47,6 +48,24 @@ function verifyBearerToken(req: Request): boolean {
 export async function POST(req: Request) {
   if (!verifyBearerToken(req)) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const token = req.headers.get('authorization')!.substring(7);
+  const { allowed, retryAfterSeconds } = checkRateLimit(token, {
+    capacity: Number(process.env.RATE_LIMIT_CAPACITY || 10),
+    refillRate: Number(process.env.RATE_LIMIT_REFILL_RATE || 1),
+  });
+
+  if (!allowed) {
+    return Response.json(
+      { error: 'Too Many Requests' },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': retryAfterSeconds.toString(),
+        },
+      }
+    );
   }
 
   let body: unknown;
