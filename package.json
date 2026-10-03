@@ -12,19 +12,20 @@
     "db:seed": "node --import tsx/esm scripts/seed.ts"
   },
   "dependencies": {
+    "drizzle-orm": "^0.33.0",
+    "mcp-handler": "2.1.1",
     "next": "^14.2.0",
+    "postgres": "^3.4.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "drizzle-orm": "^0.33.0",
-    "postgres": "^3.4.0",
-    "zod": "^3.23.0"
+    "zod": "4.6.5"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
-    "typescript": "^5.5.0",
     "drizzle-kit": "^0.24.0",
-    "tsx": "^4.19.0"
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0"
   }
 }
