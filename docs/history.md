@@ -2,6 +2,12 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:21 -->
+## 2026-10-03 — q-0033 Fix unreadable /compare (white text on white)
+[PR #21](https://github.com/homezloco/modelright/pull/21) · `modelright/q-0033-compare-contrast` · 4 files · +82/-34 · $0.89
+
+Agent's note: [docs/loop-reports/2026-10-02-q-0033-compare-contrast.md](docs/loop-reports/2026-10-02-q-0033-compare-contrast.md)
+
 <!-- pr:22 -->
 ## 2026-10-03 — q-0018 Rate limiting on /api/ingest
 [PR #22](https://github.com/homezloco/modelright/pull/22) · `modelright/q-0018-rate-limiting` · 4 files · +88/-26 · $0.05
