@@ -267,4 +267,30 @@ async function metered(req: Request) {
   return handler(req);
 }
 
-export { metered as GET, metered as POST };
+// Wildcard CORS: the surface is unauthenticated + read-only, so browser-based
+// MCP clients on any origin (embedded agents in other webapps) may call it
+// directly. Mcp-Session-Id is exposed so the Streamable HTTP client can read
+// the session id back. No credentials mode — the endpoint uses none.
+const CORS_HEADERS: Record<string, string> = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers":
+    "Content-Type, Authorization, X-API-Key, Accept, MCP-Protocol-Version, Mcp-Session-Id, Last-Event-ID",
+  "Access-Control-Expose-Headers": "Mcp-Session-Id",
+  "Access-Control-Max-Age": "86400",
+};
+
+function withCors(res: Response): Response {
+  for (const [k, v] of Object.entries(CORS_HEADERS)) res.headers.set(k, v);
+  return res;
+}
+
+async function cors(req: Request) {
+  return withCors(await metered(req));
+}
+
+export function OPTIONS() {
+  return new Response(null, { status: 204, headers: CORS_HEADERS });
+}
+
+export { cors as GET, cors as POST };
