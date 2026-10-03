@@ -5,11 +5,11 @@ import { eq, asc } from 'drizzle-orm';
 
 export const dynamic = 'force-dynamic';
 
-interface ComparePageProps {
-  searchParams: {
+interface PageProps {
+  searchParams: Promise<{
     a?: string;
     b?: string;
-  };
+  }>;
 }
 
 interface ModelItem {
@@ -36,7 +36,8 @@ function parseModelParam(param?: string) {
   return { provider: provider.toLowerCase(), slug: slug.toLowerCase() };
 }
 
-export default async function ComparePage({ searchParams }: ComparePageProps) {
+export default async function ComparePage(props: PageProps) {
+  const searchParams = await props.searchParams;
   let allModels: ModelItem[] = [];
 
   try {
@@ -86,19 +87,19 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
       )
     : null;
 
-  const showComparison = modelA && modelB;
+  const showComparison = Boolean(modelA && modelB);
 
   return (
     <main style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif', maxWidth: '900px', margin: '0 auto' }}>
       <h1>Compare Models</h1>
-      <p style={{ color: '#666', marginBottom: '2rem' }}>
+      <p style={{ color: '#94a3b8', marginBottom: '2rem' }}>
         Compare specifications, pricing, and capabilities side-by-side across AI model providers.
       </p>
 
-      {showComparison ? (
+      {showComparison && modelA && modelB ? (
         <div>
           <div style={{ marginBottom: '1.5rem' }}>
-            <Link href="/compare" style={{ color: '#0066cc', textDecoration: 'none' }}>
+            <Link href="/compare" style={{ color: '#38bdf8', textDecoration: 'none' }}>
               ← Reset comparison / Pick different models
             </Link>
           </div>
@@ -106,49 +107,49 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
             style={{
               width: '100%',
               borderCollapse: 'collapse',
-              border: '1px solid #e5e7eb',
+              border: '1px solid #334155',
               textAlign: 'left',
             }}
           >
             <thead>
-              <tr style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+              <tr style={{ backgroundColor: '#1e293b', borderBottom: '1px solid #334155' }}>
                 <th style={{ padding: '0.75rem 1rem', width: '30%' }}>Spec / Metric</th>
                 <th style={{ padding: '0.75rem 1rem', width: '35%' }}>{modelA.name} ({modelA.providerName})</th>
                 <th style={{ padding: '0.75rem 1rem', width: '35%' }}>{modelB.name} ({modelB.providerName})</th>
               </tr>
             </thead>
             <tbody>
-              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+              <tr style={{ borderBottom: '1px solid #334155' }}>
                 <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Provider</td>
                 <td style={{ padding: '0.75rem 1rem' }}>{modelA.providerName}</td>
                 <td style={{ padding: '0.75rem 1rem' }}>{modelB.providerName}</td>
               </tr>
-              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+              <tr style={{ borderBottom: '1px solid #334155' }}>
                 <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Slug</td>
                 <td style={{ padding: '0.75rem 1rem' }}>{modelA.slug}</td>
                 <td style={{ padding: '0.75rem 1rem' }}>{modelB.slug}</td>
               </tr>
-              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+              <tr style={{ borderBottom: '1px solid #334155' }}>
                 <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Context Window</td>
                 <td style={{ padding: '0.75rem 1rem' }}>{modelA.contextWindow.toLocaleString()} tokens</td>
                 <td style={{ padding: '0.75rem 1rem' }}>{modelB.contextWindow.toLocaleString()} tokens</td>
               </tr>
-              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+              <tr style={{ borderBottom: '1px solid #334155' }}>
                 <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Input Price (per 1M)</td>
                 <td style={{ padding: '0.75rem 1rem' }}>${Number(modelA.inputPricePerM).toFixed(4)}</td>
                 <td style={{ padding: '0.75rem 1rem' }}>${Number(modelB.inputPricePerM).toFixed(4)}</td>
               </tr>
-              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+              <tr style={{ borderBottom: '1px solid #334155' }}>
                 <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Output Price (per 1M)</td>
                 <td style={{ padding: '0.75rem 1rem' }}>${Number(modelA.outputPricePerM).toFixed(4)}</td>
                 <td style={{ padding: '0.75rem 1rem' }}>${Number(modelB.outputPricePerM).toFixed(4)}</td>
               </tr>
-              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+              <tr style={{ borderBottom: '1px solid #334155' }}>
                 <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Modalities</td>
                 <td style={{ padding: '0.75rem 1rem' }}>{modelA.modalityTags.length > 0 ? modelA.modalityTags.join(', ') : 'text'}</td>
                 <td style={{ padding: '0.75rem 1rem' }}>{modelB.modalityTags.length > 0 ? modelB.modalityTags.join(', ') : 'text'}</td>
               </tr>
-              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+              <tr style={{ borderBottom: '1px solid #334155' }}>
                 <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Availability Status</td>
                 <td style={{ padding: '0.75rem 1rem' }}>
                   <span
@@ -204,10 +205,10 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
           </table>
         </div>
       ) : (
-        <div style={{ backgroundColor: '#f9fafb', padding: '1.5rem', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+        <div style={{ backgroundColor: '#1e293b', padding: '1.5rem', borderRadius: '8px', border: '1px solid #334155' }}>
           <h2 style={{ marginTop: 0, fontSize: '1.25rem' }}>Select Models to Compare</h2>
           {(searchParams.a || searchParams.b) && (!modelA || !modelB) && (
-            <p style={{ color: '#d97706', fontSize: '0.9rem', marginBottom: '1rem' }}>
+            <p style={{ color: '#f59e0b', fontSize: '0.9rem', marginBottom: '1rem' }}>
               One or both requested models could not be found in the database. Please pick valid models from below.
             </p>
           )}
@@ -220,7 +221,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
                   <li>
                     <Link
                       href={`/compare?a=${allModels[0].providerSlug}/${allModels[0].slug}&b=${allModels[1].providerSlug}/${allModels[1].slug}`}
-                      style={{ color: '#0066cc' }}
+                      style={{ color: '#38bdf8' }}
                     >
                       {allModels[0].providerName} {allModels[0].name} vs {allModels[1].providerName} {allModels[1].name}
                     </Link>
@@ -230,7 +231,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
                   <li>
                     <Link
                       href={`/compare?a=${allModels[0].providerSlug}/${allModels[0].slug}&b=${allModels[2].providerSlug}/${allModels[2].slug}`}
-                      style={{ color: '#0066cc' }}
+                      style={{ color: '#38bdf8' }}
                     >
                       {allModels[0].providerName} {allModels[0].name} vs {allModels[2].providerName} {allModels[2].name}
                     </Link>
@@ -243,7 +244,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
           <div style={{ marginTop: '1.5rem' }}>
             <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Available Models</h3>
             {allModels.length === 0 ? (
-              <p style={{ color: '#666', fontStyle: 'italic' }}>No models available in the database.</p>
+              <p style={{ color: '#94a3b8', fontStyle: 'italic' }}>No models available in the database.</p>
             ) : (
               <ul style={{ paddingLeft: '1.25rem', lineHeight: '1.6' }}>
                 {allModels.map((model) => (
