@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import test from 'node:test';
+import { test } from 'vitest';
 import assert from 'node:assert';
 
 test('compare page does not contain light background colors or light borders', () => {
