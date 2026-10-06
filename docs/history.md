@@ -2,6 +2,12 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:29 -->
+## 2026-10-06 — q-0022 Provider directory
+[PR #29](https://github.com/homezloco/modelright/pull/29) · `modelright/q-0022-provider-directory` · 7 files · +356/-2 · $1.00
+
+Agent's note: [docs/loop-reports/2026-10-02-q-0022-provider-directory.md](docs/loop-reports/2026-10-02-q-0022-provider-directory.md)
+
 <!-- pr:28 -->
 ## 2026-10-06 — q-0021 Real data in production + freshness
 [PR #28](https://github.com/homezloco/modelright/pull/28) · `modelright/q-0021-real-data-freshness` · 8 files · +125/-1 · $0.12
