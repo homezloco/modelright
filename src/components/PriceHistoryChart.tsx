@@ -59,6 +59,11 @@ export function PriceHistoryChart({ snapshots, width = 600, height = 200 }: Pric
   const inputPointsStr = points.map((p) => `${getX(p.time)},${getY(p.inputVal)}`).join(' ');
   const outputPointsStr = points.map((p) => `${getX(p.time)},${getY(p.outputVal)}`).join(' ');
 
+  const sameDay = points.every((p) => p.dateLabel === points[0].dateLabel);
+  const tickLabel = (p: (typeof points)[number]) =>
+    sameDay ? new Date(p.time).toISOString().slice(11, 16) + 'Z' : p.dateLabel;
+  let lastLabelX = -Infinity;
+
   return (
     <div style={{ margin: '1rem 0' }}>
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ width: '100%', maxWidth: `${width}px`, height: 'auto', overflow: 'visible' }}>
@@ -93,10 +98,17 @@ export function PriceHistoryChart({ snapshots, width = 600, height = 200 }: Pric
           <g key={idx}>
             <circle cx={getX(p.time)} cy={getY(p.inputVal)} r="4" fill="#2563eb" />
             <circle cx={getX(p.time)} cy={getY(p.outputVal)} r="4" fill="#9333ea" />
-            {/* X-axis date labels */}
-            <text x={getX(p.time)} y={padding.top + innerHeight + 16} textAnchor="middle" fontSize="10" fill="#94a3b8">
-              {p.dateLabel}
-            </text>
+            {/* X-axis labels — thinned to avoid overlap; HH:mm when all points share a day */}
+            {(() => {
+              const x = getX(p.time);
+              if (x - lastLabelX < 60) return null;
+              lastLabelX = x;
+              return (
+                <text x={x} y={padding.top + innerHeight + 16} textAnchor="middle" fontSize="10" fill="#94a3b8">
+                  {tickLabel(p)}
+                </text>
+              );
+            })()}
           </g>
         ))}
       </svg>

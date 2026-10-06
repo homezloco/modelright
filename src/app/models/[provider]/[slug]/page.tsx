@@ -106,19 +106,19 @@ export default async function ModelDetailPage({ params }: ModelDetailPageProps) 
       <section style={{ marginBottom: '2.5rem' }}>
         <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Specifications</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
-          <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px' }}>
+          <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
             <div style={{ fontSize: '0.85rem', color: '#666' }}>Context Window</div>
             <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
               {model.contextWindow.toLocaleString()} tokens
             </div>
           </div>
-          <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px' }}>
+          <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
             <div style={{ fontSize: '0.85rem', color: '#666' }}>Input Price / 1M</div>
             <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
               {model.inputPricePerM}
             </div>
           </div>
-          <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px' }}>
+          <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
             <div style={{ fontSize: '0.85rem', color: '#666' }}>Output Price / 1M</div>
             <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
               {model.outputPricePerM}
