@@ -55,6 +55,9 @@ export default async function RootLayout({
                 <Link href="/compare" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 500 }}>
                   Compare
                 </Link>
+                <Link href="/calculator" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 500 }}>
+                  Calculator
+                </Link>
                 <Link href="/changes" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 500 }}>
                   Changes
                 </Link>
