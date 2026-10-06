@@ -215,7 +215,7 @@ export default async function ModelsPage({
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
-                <tr style={{ borderBottom: '2px solid #e5e7eb', backgroundColor: '#f9fafb' }}>
+                <tr style={{ borderBottom: '2px solid #e5e7eb', backgroundColor: '#f9fafb', color: '#374151' }}>
                   <th style={{ padding: '0.75rem 1rem' }}>Status</th>
                   <th style={{ padding: '0.75rem 1rem' }}>Provider</th>
                   <th style={{ padding: '0.75rem 1rem' }}>Name</th>
