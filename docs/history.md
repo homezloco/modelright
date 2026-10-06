@@ -2,6 +2,12 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:26 -->
+## 2026-10-06 — q-0019 OpenRouter source adapter
+[PR #26](https://github.com/homezloco/modelright/pull/26) · `modelright/q-0019-openrouter-adapter` · 12 files · +2357/-680 · $0.78
+
+Agent's note: [docs/loop-reports/2026-10-02-q-0019-openrouter-adapter.md](docs/loop-reports/2026-10-02-q-0019-openrouter-adapter.md)
+
 <!-- pr:25 -->
 ## 2026-10-06 — q-0024 Changes feed + RSS
 [PR #25](https://github.com/homezloco/modelright/pull/25) · `modelright/q-0024-changes-feed` · 7 files · +662/-0 · $0.26
