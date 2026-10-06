@@ -1,30 +1,42 @@
+import { NextResponse } from 'next/server';
 import { db } from '@/db/client';
 import { models, modelSnapshots, providers } from '@/db/schema';
-import { desc, gte } from 'drizzle-orm';
-import { computeChangeEvents, generateRssFeed } from '@/lib/changes';
+import { computeChangeEvents, generateRssXml } from '@/lib/changes';
+import { gte } from 'drizzle-orm';
 
-export const revalidate = 3600;
+export const revalidate = 300;
+
+interface ProviderRow {
+  id: string;
+  slug: string;
+  name: string;
+}
 
 export async function GET() {
-  let events: ReturnType<typeof computeChangeEvents> = [];
+  let events = [];
 
-  if (db) {
+  if (process.env.DATABASE_URL && db) {
     try {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-      const allProviders = await db.select().from(providers);
-      const providerMap = new Map(allProviders.map((p) => [p.id, p]));
+      const allProviders: ProviderRow[] = await db.select({
+        id: providers.id,
+        slug: providers.slug,
+        name: providers.name,
+      }).from(providers);
+
+      const providerMap = new Map<string, ProviderRow>(allProviders.map((p) => [p.id, p]));
 
       const rawModels = await db.select().from(models);
-      const modelRows = rawModels.map((m) => {
-        const p = providerMap.get(m.providerId);
+      const modelsList = rawModels.map((m) => {
+        const provider = m.providerId ? providerMap.get(m.providerId) : undefined;
         return {
           id: m.id,
           name: m.name,
           slug: m.slug,
-          providerSlug: p?.slug,
-          providerName: p?.name,
+          providerSlug: provider?.slug || '',
+          providerName: provider?.name || 'Unknown',
           inputPricePerM: m.inputPricePerM,
           outputPricePerM: m.outputPricePerM,
           createdAt: m.createdAt,
@@ -34,10 +46,9 @@ export async function GET() {
       const rawSnapshots = await db
         .select()
         .from(modelSnapshots)
-        .where(gte(modelSnapshots.capturedAt, thirtyDaysAgo))
-        .orderBy(desc(modelSnapshots.capturedAt));
+        .where(gte(modelSnapshots.capturedAt, thirtyDaysAgo));
 
-      const snapshotRows = rawSnapshots.map((s) => ({
+      const snapshotList = rawSnapshots.map((s) => ({
         id: s.id,
         modelId: s.modelId,
         capturedAt: s.capturedAt,
@@ -46,18 +57,19 @@ export async function GET() {
         outputPricePerM: s.outputPricePerM,
       }));
 
-      events = computeChangeEvents(modelRows, snapshotRows, { days: 30 });
-    } catch (e) {
-      console.error('Failed to generate RSS feed:', e);
+      events = computeChangeEvents(modelsList, snapshotList, 30);
+    } catch (err) {
+      console.error('Failed to query catalog events for RSS:', err);
     }
   }
 
-  const xml = generateRssFeed(events);
+  const xml = generateRssXml(events, 'https://modelright.ai');
 
-  return new Response(xml, {
+  return new NextResponse(xml, {
     status: 200,
     headers: {
       'Content-Type': 'application/rss+xml; charset=utf-8',
+      'Cache-Control': 's-maxage=300, stale-while-revalidate',
     },
   });
 }
