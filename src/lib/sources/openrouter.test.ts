@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import openrouterFixture from './__fixtures__/openrouter-models.json';
-import { normalizeOpenRouter, OpenRouterResponse } from './openrouter';
+import { normalizeOpenRouter, OpenRouterRawModel } from './openrouter';
 
 describe('OpenRouter Source Adapter', () => {
   it('correctly normalizes OpenRouter catalog fixture data and ignores invalid entries', () => {
-    const normalized = normalizeOpenRouter(openrouterFixture as OpenRouterResponse);
+    const normalized = normalizeOpenRouter(openrouterFixture.data as OpenRouterRawModel[]);
 
     expect(normalized).toHaveLength(3);
 
@@ -52,7 +52,7 @@ describe('OpenRouter Source Adapter', () => {
   });
 
   it('handles empty or malformed inputs gracefully', () => {
-    expect(normalizeOpenRouter({} as OpenRouterResponse)).toEqual([]);
-    expect(normalizeOpenRouter({ data: [] })).toEqual([]);
+    expect(normalizeOpenRouter([])).toEqual([]);
+    expect(normalizeOpenRouter(undefined as unknown as OpenRouterRawModel[])).toEqual([]);
   });
 });
