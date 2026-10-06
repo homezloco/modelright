@@ -1,4 +1,4 @@
-import test from 'node:test';
+import { test } from 'vitest';
 import assert from 'node:assert';
 import { computeChangeEvents, groupEventsByDay, generateRssFeed, ModelRow, SnapshotRow } from './changes';
 
