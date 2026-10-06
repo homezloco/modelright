@@ -5,6 +5,7 @@ import { providers, models, modelSnapshots } from '@/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
 import { PriceHistoryChart } from '@/components/PriceHistoryChart';
 import { getPriceChanges } from '@/lib/price-history';
+import { fetchModelRadar, findRadarScore } from '@/lib/model-radar';
 
 interface ModelDetailPageProps {
   params: {
@@ -85,6 +86,8 @@ export default async function ModelDetailPage({ params }: ModelDetailPageProps) 
     notFound();
   }
 
+  const radarScore = findRadarScore(await fetchModelRadar(), params.provider, params.slug);
+
   return (
     <main style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif', maxWidth: '800px', margin: '0 auto' }}>
       <div style={{ marginBottom: '1.5rem' }}>
@@ -148,6 +151,43 @@ export default async function ModelDetailPage({ params }: ModelDetailPageProps) 
           </div>
         )}
       </section>
+
+      {radarScore && (
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Benchmarks</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+            <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
+              <div style={{ fontSize: '0.85rem', color: '#666' }}>Radar Score</div>
+              <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
+                {radarScore.score}/10
+              </div>
+            </div>
+            <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
+              <div style={{ fontSize: '0.85rem', color: '#666' }}>Latency</div>
+              <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
+                {radarScore.latencyMs.toLocaleString()} ms
+              </div>
+            </div>
+            {radarScore.estCostUsd != null && (
+              <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
+                <div style={{ fontSize: '0.85rem', color: '#666' }}>Est. Cost / Run</div>
+                <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
+                  ${radarScore.estCostUsd.toFixed(4)}
+                </div>
+              </div>
+            )}
+          </div>
+          {radarScore.notes && (
+            <p style={{ color: '#555', fontSize: '0.9rem', marginTop: '1rem' }}>{radarScore.notes}</p>
+          )}
+          <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.75rem' }}>
+            Benchmark data: Artificial Analysis · via{' '}
+            <a href="https://livegraph.ai/model-radar" style={{ color: '#0066cc' }}>
+              LiveGraph Model Radar
+            </a>
+          </p>
+        </section>
+      )}
 
       <section style={{ marginBottom: '2.5rem' }}>
         <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Price History</h2>
