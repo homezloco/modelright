@@ -2,6 +2,10 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:36 -->
+## 2026-10-06 — q-0031 Benchmarks from LiveGraph Model Radar
+[PR #36](https://github.com/homezloco/modelright/pull/36) · `modelright/q-0031-radar-benchmarks` · 5 files · +149/-2
+
 <!-- pr:30 -->
 ## 2026-10-06 — q-0023 Price history on model detail
 [PR #30](https://github.com/homezloco/modelright/pull/30) · `modelright/q-0023-price-history` · 5 files · +296/-89 · $0.27
