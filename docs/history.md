@@ -2,6 +2,12 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:28 -->
+## 2026-10-06 — q-0021 Real data in production + freshness
+[PR #28](https://github.com/homezloco/modelright/pull/28) · `modelright/q-0021-real-data-freshness` · 8 files · +125/-1 · $0.12
+
+Agent's note: [docs/loop-reports/2026-10-02-q-0021-real-data-freshness.md](docs/loop-reports/2026-10-02-q-0021-real-data-freshness.md)
+
 <!-- pr:27 -->
 ## 2026-10-06 — q-0020 Sync endpoint
 [PR #27](https://github.com/homezloco/modelright/pull/27) · `modelright/q-0020-sync-endpoint` · 8 files · +360/-213 · $0.66
