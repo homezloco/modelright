@@ -15,6 +15,13 @@
       "when": 1727838000000,
       "tag": "0001_availability_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1727900000000,
+      "tag": "0002_delete_seed_fixtures_if_synced",
+      "breakpoints": true
     }
   ]
 }

@@ -6,6 +6,11 @@ import {
   and,
 } from 'drizzle-orm';
 
+if (process.env.NODE_ENV === 'production') {
+  console.error('Seed script refused to run in production environment (NODE_ENV=production).');
+  process.exit(1);
+}
+
 const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
