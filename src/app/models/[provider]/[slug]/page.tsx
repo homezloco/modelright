@@ -6,6 +6,7 @@ import { eq, and, desc } from 'drizzle-orm';
 import { PriceHistoryChart } from '@/components/PriceHistoryChart';
 import { getPriceChanges } from '@/lib/price-history';
 import { fetchModelRadar, findRadarScore } from '@/lib/model-radar';
+import { CostCalculator } from '@/components/CostCalculator';
 
 interface ModelDetailPageProps {
   params: {
@@ -60,6 +61,8 @@ async function getModelData(providerSlug: string, modelSlug: string) {
       contextWindow: modelRec.contextWindow,
       inputPricePerM: `$${Number(modelRec.inputPricePerM).toFixed(2)}`,
       outputPricePerM: `$${Number(modelRec.outputPricePerM).toFixed(2)}`,
+      numericInputPrice: Number(modelRec.inputPricePerM),
+      numericOutputPrice: Number(modelRec.outputPricePerM),
       modalityTags: modelRec.modalityTags || [],
       updatedAt: modelRec.updatedAt ? new Date(modelRec.updatedAt).toISOString() : '',
       snapshots: snapshotRows.map((s: any) => ({
@@ -188,6 +191,14 @@ export default async function ModelDetailPage({ params }: ModelDetailPageProps) 
           </p>
         </section>
       )}
+
+      <section style={{ marginBottom: '2.5rem' }}>
+        <CostCalculator
+          modelName={model.name}
+          initialInputPricePerM={model.numericInputPrice}
+          initialOutputPricePerM={model.numericOutputPrice}
+        />
+      </section>
 
       <section style={{ marginBottom: '2.5rem' }}>
         <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Price History</h2>
