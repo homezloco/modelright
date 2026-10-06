@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db/client';
 import { models, modelSnapshots, providers } from '@/db/schema';
-import { computeChangeEvents, generateRssXml } from '@/lib/changes';
+import { computeChangeEvents, generateRssFeed, ChangeEvent, ModelRow, SnapshotRow } from '@/lib/changes';
 import { gte } from 'drizzle-orm';
 
-export const revalidate = 300;
+export const revalidate = 300; // 5 minutes
 
 interface ProviderRow {
   id: string;
@@ -13,7 +13,7 @@ interface ProviderRow {
 }
 
 export async function GET() {
-  let events = [];
+  let events: ChangeEvent[] = [];
 
   if (process.env.DATABASE_URL && db) {
     try {
@@ -26,10 +26,10 @@ export async function GET() {
         name: providers.name,
       }).from(providers);
 
-      const providerMap = new Map<string, ProviderRow>(allProviders.map((p) => [p.id, p]));
+      const providerMap = new Map<string, ProviderRow>(allProviders.map((p: ProviderRow) => [p.id, p]));
 
       const rawModels = await db.select().from(models);
-      const modelsList = rawModels.map((m) => {
+      const modelsList: ModelRow[] = rawModels.map((m: Record<string, any>) => {
         const provider = m.providerId ? providerMap.get(m.providerId) : undefined;
         return {
           id: m.id,
@@ -43,12 +43,8 @@ export async function GET() {
         };
       });
 
-      const rawSnapshots = await db
-        .select()
-        .from(modelSnapshots)
-        .where(gte(modelSnapshots.capturedAt, thirtyDaysAgo));
-
-      const snapshotList = rawSnapshots.map((s) => ({
+      const rawSnapshots = await db.select().from(modelSnapshots).where(gte(modelSnapshots.capturedAt, thirtyDaysAgo));
+      const snapshotsList: SnapshotRow[] = rawSnapshots.map((s: Record<string, any>) => ({
         id: s.id,
         modelId: s.modelId,
         capturedAt: s.capturedAt,
@@ -57,19 +53,18 @@ export async function GET() {
         outputPricePerM: s.outputPricePerM,
       }));
 
-      events = computeChangeEvents(modelsList, snapshotList, 30);
+      events = computeChangeEvents(modelsList, snapshotsList, { days: 30 });
     } catch (err) {
-      console.error('Failed to query catalog events for RSS:', err);
+      console.error('Error computing changes for RSS feed:', err);
     }
   }
 
-  const xml = generateRssXml(events, 'https://modelright.ai');
+  const xml = generateRssFeed(events);
 
   return new NextResponse(xml, {
-    status: 200,
     headers: {
       'Content-Type': 'application/rss+xml; charset=utf-8',
-      'Cache-Control': 's-maxage=300, stale-while-revalidate',
+      'Cache-Control': 's-maxage=300, stale-while-revalidate=600',
     },
   });
 }
