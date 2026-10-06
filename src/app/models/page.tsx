@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 50;
 
 interface SearchParams {
   provider?: string;
