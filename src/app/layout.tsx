@@ -49,6 +49,9 @@ export default async function RootLayout({
                 <Link href="/models" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 500 }}>
                   Models
                 </Link>
+                <Link href="/providers" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 500 }}>
+                  Providers
+                </Link>
                 <Link href="/compare" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 500 }}>
                   Compare
                 </Link>

@@ -22,6 +22,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/providers`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/compare`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
@@ -30,8 +36,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   let modelRoutes: MetadataRoute.Sitemap = [];
+  let providerRoutes: MetadataRoute.Sitemap = [];
 
   try {
+    const providerList = await db
+      .select({
+        slug: providers.slug,
+        updatedAt: providers.updatedAt,
+      })
+      .from(providers);
+
+    providerRoutes = providerList.map((p: { slug: string; updatedAt: Date | null }) => ({
+      url: `${baseUrl}/providers/${p.slug}`,
+      lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
+    }));
+
     const modelList = await db
       .select({
         providerSlug: providers.slug,
@@ -48,8 +69,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }));
   } catch (error) {
-    console.error('Failed to generate sitemap model routes:', error);
+    console.error('Failed to generate sitemap routes:', error);
   }
 
-  return [...staticRoutes, ...modelRoutes];
+  return [...staticRoutes, ...providerRoutes, ...modelRoutes];
 }
