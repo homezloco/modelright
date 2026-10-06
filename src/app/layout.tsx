@@ -28,6 +28,9 @@ export default function RootLayout({
                 <Link href="/compare" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 500 }}>
                   Compare
                 </Link>
+                <Link href="/changes" style={{ color: '#94a3b8', textDecoration: 'none', fontWeight: 500 }}>
+                  Changes
+                </Link>
               </nav>
             </div>
             <HeaderSearch />
@@ -44,6 +47,9 @@ export default function RootLayout({
               &copy; {new Date().getFullYear()} modelright. AI model specification &amp; pricing registry.
             </div>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <Link href="/changes" style={{ color: '#64748b', textDecoration: 'none' }}>
+                Changes
+              </Link>
               <a href="https://livegraph.ai" target="_blank" rel="noopener noreferrer" style={{ color: '#64748b', textDecoration: 'none' }}>
                 Built with LiveGraph
               </a>
