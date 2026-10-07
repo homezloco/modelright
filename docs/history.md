@@ -2,6 +2,10 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:44 -->
+## 2026-10-07 — q-0030 "A vs B" compare pages for search
+[PR #44](https://github.com/homezloco/modelright/pull/44) · `modelright/q-0030-vs-pages` · 7 files · +462/-126 · $0.10
+
 <!-- pr:43 -->
 ## 2026-10-07 — q-0036 Interactive compare picker
 [PR #43](https://github.com/homezloco/modelright/pull/43) · `modelright/q-0036-compare-picker` · 7 files · +488/-20 · $0.03
