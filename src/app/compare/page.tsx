@@ -96,7 +96,7 @@ export default async function ComparePage(props: PageProps) {
   }
 
   const selectedModels: ModelItem[] = [];
-  const rawModelKeys = paramCheck.redirectUrl ? [] : paramCheck.modelKeys;
+  const rawModelKeys = paramCheck.modelKeys;
   for (const keyStr of rawModelKeys) {
     const parsed = parseModelParam(keyStr);
     if (parsed) {
@@ -111,10 +111,9 @@ export default async function ComparePage(props: PageProps) {
     }
   }
 
-  const resolvedParams = await props.searchParams;
-  const inTokens = Math.max(0, Number(resolvedParams.in) || 1000);
-  const outTokens = Math.max(0, Number(resolvedParams.out) || 500);
-  const rpd = Math.max(0, Number(resolvedParams.rpd) || 1000);
+  const inTokens = Math.max(0, Number(searchParams.in) || 1000);
+  const outTokens = Math.max(0, Number(searchParams.out) || 500);
+  const rpd = Math.max(0, Number(searchParams.rpd) || 1000);
   const callsPerMonth = rpd * 30;
 
   const showComparison = selectedModels.length >= 2;
@@ -161,189 +160,229 @@ export default async function ComparePage(props: PageProps) {
               }}
             >
               <thead>
-                <tr style={{ backgroundColor: '#1e293b', borderBottom: '1px solid #334155' }}>
-                  <th style={{ padding: '0.75rem 1rem', width: '25%' }}>Spec / Metric</th>
-                  {selectedModels.map((m) => (
-                    <th key={m.id} style={{ padding: '0.75rem 1rem' }}>
-                      <Link href={`/models/${m.providerSlug}/${m.slug}`} style={{ color: '#38bdf8', textDecoration: 'none' }}>
-                        {m.name}
-                      </Link>
-                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 400 }}>{m.providerName}</div>
+                <tr style={{ backgroundColor: '#1e293b', borderBottom: '2px solid #334155' }}>
+                  <th style={{ padding: '0.75rem', borderRight: '1px solid #334155', width: '200px' }}>Attribute</th>
+                  {selectedModels.map((model) => (
+                    <th key={model.id} style={{ padding: '0.75rem', borderRight: '1px solid #334155' }}>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>{model.name}</div>
+                      <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
+                        {model.providerName} ({model.providerSlug}/{model.slug})
+                      </div>
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                <tr style={{ borderBottom: '1px solid #334155' }}>
-                  <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Provider</td>
-                  {selectedModels.map((m) => (
-                    <td key={m.id} style={{ padding: '0.75rem 1rem' }}>{m.providerName}</td>
-                  ))}
-                </tr>
-                <tr style={{ borderBottom: '1px solid #334155' }}>
-                  <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Context Window</td>
-                  {selectedModels.map((m) => (
-                    <td key={m.id} style={{ padding: '0.75rem 1rem' }}>{m.contextWindow.toLocaleString()} tokens</td>
-                  ))}
-                </tr>
-                <tr style={{ borderBottom: '1px solid #334155' }}>
-                  <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Input Price / 1M</td>
-                  {selectedModels.map((m) => {
-                    const isCheapest = minInputPrice !== null && m.numericInputPrice === minInputPrice;
-                    return (
-                      <td
-                        key={m.id}
-                        style={{
-                          padding: '0.75rem 1rem',
-                          backgroundColor: isCheapest ? '#064e3b' : 'transparent',
-                          fontWeight: isCheapest ? 700 : 400,
-                        }}
-                      >
-                        ${m.numericInputPrice.toFixed(2)}
-                        {isCheapest && <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: '#34d399' }}>(Cheapest)</span>}
-                      </td>
-                    );
-                  })}
-                </tr>
-                <tr style={{ borderBottom: '1px solid #334155' }}>
-                  <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Output Price / 1M</td>
-                  {selectedModels.map((m) => {
-                    const isCheapest = minOutputPrice !== null && m.numericOutputPrice === minOutputPrice;
-                    return (
-                      <td
-                        key={m.id}
-                        style={{
-                          padding: '0.75rem 1rem',
-                          backgroundColor: isCheapest ? '#064e3b' : 'transparent',
-                          fontWeight: isCheapest ? 700 : 400,
-                        }}
-                      >
-                        ${m.numericOutputPrice.toFixed(2)}
-                        {isCheapest && <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: '#34d399' }}>(Cheapest)</span>}
-                      </td>
-                    );
-                  })}
-                </tr>
-                {/* Calculator Totals Section */}
-                <tr style={{ backgroundColor: '#0f172a', borderBottom: '1px solid #334155' }}>
-                  <td colSpan={selectedModels.length + 1} style={{ padding: '0.75rem 1rem', fontWeight: 700, color: '#38bdf8' }}>
-                    Cost Calculator Totals ({inTokens} in / {outTokens} out tokens @ {rpd} req/day)
+                <tr>
+                  <td style={{ padding: '0.75rem', fontWeight: '600', borderRight: '1px solid #334155', borderBottom: '1px solid #334155' }}>
+                    Context Window
                   </td>
-                </tr>
-                <tr style={{ borderBottom: '1px solid #334155' }}>
-                  <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Cost / Request</td>
-                  {selectedModels.map((m, idx) => {
-                    const cost = calcResults[idx].totalCostPerCall;
-                    const isCheapest = minCostPerCall !== null && Math.abs(cost - minCostPerCall) < 1e-9;
-                    return (
-                      <td
-                        key={m.id}
-                        style={{
-                          padding: '0.75rem 1rem',
-                          backgroundColor: isCheapest ? '#064e3b' : 'transparent',
-                          fontWeight: isCheapest ? 700 : 400,
-                        }}
-                      >
-                        ${cost.toFixed(4)}
-                        {isCheapest && <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: '#34d399' }}>(Cheapest)</span>}
-                      </td>
-                    );
-                  })}
-                </tr>
-                <tr style={{ borderBottom: '1px solid #334155' }}>
-                  <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Cost / Day</td>
-                  {selectedModels.map((m, idx) => {
-                    const cost = calcResults[idx].totalCostPerCall * rpd;
-                    const isCheapest = minCostPerDay !== null && Math.abs(cost - minCostPerDay) < 1e-9;
-                    return (
-                      <td
-                        key={m.id}
-                        style={{
-                          padding: '0.75rem 1rem',
-                          backgroundColor: isCheapest ? '#064e3b' : 'transparent',
-                          fontWeight: isCheapest ? 700 : 400,
-                        }}
-                      >
-                        ${cost.toFixed(2)}
-                        {isCheapest && <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: '#34d399' }}>(Cheapest)</span>}
-                      </td>
-                    );
-                  })}
-                </tr>
-                <tr style={{ borderBottom: '1px solid #334155' }}>
-                  <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Cost / Month (30d)</td>
-                  {selectedModels.map((m, idx) => {
-                    const cost = calcResults[idx].totalCostPerMonth;
-                    const isCheapest = minCostPerMonth !== null && Math.abs(cost - minCostPerMonth) < 1e-9;
-                    return (
-                      <td
-                        key={m.id}
-                        style={{
-                          padding: '0.75rem 1rem',
-                          backgroundColor: isCheapest ? '#064e3b' : 'transparent',
-                          fontWeight: isCheapest ? 700 : 400,
-                        }}
-                      >
-                        ${cost.toFixed(2)}
-                        {isCheapest && <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: '#34d399' }}>(Cheapest)</span>}
-                      </td>
-                    );
-                  })}
-                </tr>
-                <tr style={{ borderBottom: '1px solid #334155' }}>
-                  <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Modalities</td>
-                  {selectedModels.map((m) => (
-                    <td key={m.id} style={{ padding: '0.75rem 1rem' }}>
-                      {m.modalityTags.length > 0 ? m.modalityTags.join(', ') : 'text'}
+                  {selectedModels.map((model) => (
+                    <td key={model.id} style={{ padding: '0.75rem', borderRight: '1px solid #334155', borderBottom: '1px solid #334155' }}>
+                      {model.contextWindow ? model.contextWindow.toLocaleString() : 'N/A'} tokens
                     </td>
                   ))}
                 </tr>
+
                 <tr>
-                  <td style={{ padding: '0.75rem 1rem', fontWeight: 600 }}>Status</td>
-                  {selectedModels.map((m) => (
-                    <td key={m.id} style={{ padding: '0.75rem 1rem' }}>
+                  <td style={{ padding: '0.75rem', fontWeight: '600', borderRight: '1px solid #334155', borderBottom: '1px solid #334155' }}>
+                    Input Price / 1M
+                  </td>
+                  {selectedModels.map((model) => {
+                    const isCheapest = minInputPrice !== null && model.numericInputPrice === minInputPrice;
+                    return (
+                      <td
+                        key={model.id}
+                        style={{
+                          padding: '0.75rem',
+                          borderRight: '1px solid #334155',
+                          borderBottom: '1px solid #334155',
+                          backgroundColor: isCheapest ? '#064e3b' : undefined,
+                        }}
+                      >
+                        ${model.numericInputPrice.toFixed(4)}
+                        {isCheapest && <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: '#34d399', fontWeight: 'bold' }}>Cheapest</span>}
+                      </td>
+                    );
+                  })}
+                </tr>
+
+                <tr>
+                  <td style={{ padding: '0.75rem', fontWeight: '600', borderRight: '1px solid #334155', borderBottom: '1px solid #334155' }}>
+                    Output Price / 1M
+                  </td>
+                  {selectedModels.map((model) => {
+                    const isCheapest = minOutputPrice !== null && model.numericOutputPrice === minOutputPrice;
+                    return (
+                      <td
+                        key={model.id}
+                        style={{
+                          padding: '0.75rem',
+                          borderRight: '1px solid #334155',
+                          borderBottom: '1px solid #334155',
+                          backgroundColor: isCheapest ? '#064e3b' : undefined,
+                        }}
+                      >
+                        ${model.numericOutputPrice.toFixed(4)}
+                        {isCheapest && <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: '#34d399', fontWeight: 'bold' }}>Cheapest</span>}
+                      </td>
+                    );
+                  })}
+                </tr>
+
+                <tr>
+                  <td style={{ padding: '0.75rem', fontWeight: '600', borderRight: '1px solid #334155', borderBottom: '1px solid #334155' }}>
+                    Modalities
+                  </td>
+                  {selectedModels.map((model) => (
+                    <td key={model.id} style={{ padding: '0.75rem', borderRight: '1px solid #334155', borderBottom: '1px solid #334155' }}>
+                      {model.modalityTags.length > 0 ? model.modalityTags.join(', ') : 'Text'}
+                    </td>
+                  ))}
+                </tr>
+
+                <tr>
+                  <td style={{ padding: '0.75rem', fontWeight: '600', borderRight: '1px solid #334155', borderBottom: '1px solid #334155' }}>
+                    Status
+                  </td>
+                  {selectedModels.map((model) => (
+                    <td key={model.id} style={{ padding: '0.75rem', borderRight: '1px solid #334155', borderBottom: '1px solid #334155' }}>
                       <span
                         style={{
                           display: 'inline-block',
-                          width: '10px',
-                          height: '10px',
+                          width: '8px',
+                          height: '8px',
                           borderRadius: '50%',
+                          backgroundColor: model.status === 'ok' ? '#22c55e' : model.status === 'degraded' ? '#f59e0b' : '#64748b',
                           marginRight: '0.5rem',
-                          backgroundColor:
-                            m.status === 'ok' ? '#10b981' : m.status === 'degraded' ? '#f59e0b' : '#9ca3af',
                         }}
                       />
-                      {m.status}
+                      {model.status || 'unknown'}
                     </td>
                   ))}
+                </tr>
+
+                <tr>
+                  <td style={{ padding: '0.75rem', fontWeight: '600', borderRight: '1px solid #334155', borderBottom: '1px solid #334155' }}>
+                    Last Seen
+                  </td>
+                  {selectedModels.map((model) => (
+                    <td key={model.id} style={{ padding: '0.75rem', borderRight: '1px solid #334155', borderBottom: '1px solid #334155' }}>
+                      {model.lastSeenAt ? new Date(model.lastSeenAt).toLocaleDateString() : 'N/A'}
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Calculator Rows */}
+                <tr style={{ backgroundColor: '#1e293b' }}>
+                  <td
+                    colSpan={selectedModels.length + 1}
+                    style={{ padding: '0.75rem', fontWeight: 'bold', borderBottom: '1px solid #334155', fontSize: '1.05rem' }}
+                  >
+                    Estimated Usage Costs ({inTokens.toLocaleString()} in / {outTokens.toLocaleString()} out / {rpd.toLocaleString()} req/day)
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style={{ padding: '0.75rem', fontWeight: '600', borderRight: '1px solid #334155', borderBottom: '1px solid #334155' }}>
+                    Cost / Request
+                  </td>
+                  {calcResults.map((calc, idx) => {
+                    const isCheapest = minCostPerCall !== null && calc.totalCostPerCall === minCostPerCall;
+                    return (
+                      <td
+                        key={selectedModels[idx].id}
+                        style={{
+                          padding: '0.75rem',
+                          borderRight: '1px solid #334155',
+                          borderBottom: '1px solid #334155',
+                          backgroundColor: isCheapest ? '#064e3b' : undefined,
+                        }}
+                      >
+                        ${calc.totalCostPerCall.toFixed(6)}
+                        {isCheapest && <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: '#34d399', fontWeight: 'bold' }}>Cheapest</span>}
+                      </td>
+                    );
+                  })}
+                </tr>
+
+                <tr>
+                  <td style={{ padding: '0.75rem', fontWeight: '600', borderRight: '1px solid #334155', borderBottom: '1px solid #334155' }}>
+                    Cost / Day
+                  </td>
+                  {calcResults.map((calc, idx) => {
+                    const costPerDay = calc.totalCostPerCall * rpd;
+                    const isCheapest = minCostPerDay !== null && costPerDay === minCostPerDay;
+                    return (
+                      <td
+                        key={selectedModels[idx].id}
+                        style={{
+                          padding: '0.75rem',
+                          borderRight: '1px solid #334155',
+                          borderBottom: '1px solid #334155',
+                          backgroundColor: isCheapest ? '#064e3b' : undefined,
+                        }}
+                      >
+                        ${costPerDay.toFixed(4)}
+                        {isCheapest && <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: '#34d399', fontWeight: 'bold' }}>Cheapest</span>}
+                      </td>
+                    );
+                  })}
+                </tr>
+
+                <tr>
+                  <td style={{ padding: '0.75rem', fontWeight: '600', borderRight: '1px solid #334155', borderBottom: '1px solid #334155' }}>
+                    Cost / Month (30d)
+                  </td>
+                  {calcResults.map((calc, idx) => {
+                    const isCheapest = minCostPerMonth !== null && calc.totalCostPerMonth === minCostPerMonth;
+                    return (
+                      <td
+                        key={selectedModels[idx].id}
+                        style={{
+                          padding: '0.75rem',
+                          borderRight: '1px solid #334155',
+                          borderBottom: '1px solid #334155',
+                          backgroundColor: isCheapest ? '#064e3b' : undefined,
+                        }}
+                      >
+                        ${calc.totalCostPerMonth.toFixed(2)}
+                        {isCheapest && <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: '#34d399', fontWeight: 'bold' }}>Cheapest</span>}
+                      </td>
+                    );
+                  })}
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
       ) : (
-        <div style={{ backgroundColor: '#1e293b', padding: '1.5rem', borderRadius: '8px', border: '1px solid #334155' }}>
-          <h2 style={{ marginTop: 0, fontSize: '1.25rem' }}>Select Models to Compare</h2>
-          {paramCheck.modelKeys.length > 0 && selectedModels.length < 2 && (
-            <p style={{ color: '#f59e0b', fontSize: '0.9rem', marginBottom: '1rem' }}>
-              Please specify at least 2 valid models in the parameter (e.g., <code>?m=provider/slug,provider/slug</code>).
+        <div>
+          <div style={{ padding: '1.5rem', backgroundColor: '#1e293b', borderRadius: '8px', border: '1px solid #334155', marginBottom: '2rem' }}>
+            <h2 style={{ fontSize: '1.25rem', marginTop: 0, marginBottom: '0.75rem' }}>Select Models to Compare</h2>
+            <p style={{ color: '#94a3b8', fontSize: '0.95rem', marginBottom: '1rem' }}>
+              Specify 2 to 4 model keys in the URL parameter <code>?m=provider/slug,provider/slug</code> or pick from available models below.
             </p>
-          )}
 
-          {allModels.length > 0 && (
-            <div style={{ marginTop: '1.5rem' }}>
+            {selectedModels.length === 1 && (
+              <p style={{ color: '#f59e0b', fontSize: '0.9rem' }}>
+                Only 1 valid model selected ({selectedModels[0].name}). Please add at least 1 more model to compare.
+              </p>
+            )}
+          </div>
+
+          {allModels.length >= 2 && (
+            <div>
               <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Preset Comparisons</h3>
-              <ul style={{ paddingLeft: '1.25rem', lineHeight: '1.8' }}>
-                {allModels.length >= 2 && (
-                  <li>
-                    <Link
-                      href={`/compare?m=${allModels[0].providerSlug}/${allModels[0].slug},${allModels[1].providerSlug}/${allModels[1].slug}`}
-                      style={{ color: '#38bdf8' }}
-                    >
-                      {allModels[0].providerName} {allModels[0].name} vs {allModels[1].providerName} {allModels[1].name}
-                    </Link>
-                  </li>
-                )}
+              <ul style={{ paddingLeft: '1.25rem', lineHeight: '1.6' }}>
+                <li>
+                  <Link
+                    href={`/compare?m=${allModels[0].providerSlug}/${allModels[0].slug},${allModels[1].providerSlug}/${allModels[1].slug}`}
+                    style={{ color: '#38bdf8' }}
+                  >
+                    {allModels[0].name} vs {allModels[1].name}
+                  </Link>
+                </li>
                 {allModels.length >= 3 && (
                   <li>
                     <Link
