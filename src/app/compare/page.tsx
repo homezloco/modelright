@@ -53,9 +53,9 @@ export function processCompareParams(params: Record<string, string | string[] | 
 }
 
 export default async function ComparePage(props: PageProps) {
-  const searchParams = await props.searchParams;
+  const resolvedSearchParams = await props.searchParams;
 
-  const paramCheck = processCompareParams(searchParams);
+  const paramCheck = processCompareParams(resolvedSearchParams);
   if (paramCheck.redirectUrl) {
     redirect(paramCheck.redirectUrl);
   }
@@ -109,9 +109,9 @@ export default async function ComparePage(props: PageProps) {
   }
 
   const getParam = (val?: string | string[]) => (Array.isArray(val) ? val[0] : val);
-  const inTokens = Math.max(0, Number(getParam(searchParams.in)) || 1000);
-  const outTokens = Math.max(0, Number(getParam(searchParams.out)) || 500);
-  const rpd = Math.max(0, Number(getParam(searchParams.rpd)) || 1000);
+  const inTokens = Math.max(0, Number(getParam(resolvedSearchParams.in)) || 1000);
+  const outTokens = Math.max(0, Number(getParam(resolvedSearchParams.out)) || 500);
+  const rpd = Math.max(0, Number(getParam(resolvedSearchParams.rpd)) || 1000);
   const callsPerMonth = rpd * 30;
 
   const showComparison = selectedModels.length >= 2;
