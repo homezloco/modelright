@@ -8,14 +8,7 @@ import { calculateCost } from '@/lib/calculator';
 export const dynamic = 'force-dynamic';
 
 export interface PageProps {
-  searchParams: Promise<{
-    a?: string;
-    b?: string;
-    m?: string;
-    in?: string;
-    out?: string;
-    rpd?: string;
-  }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export interface ModelItem {
@@ -44,12 +37,16 @@ export function parseModelParam(param?: string) {
   return { provider: provider.toLowerCase(), slug: slug.toLowerCase() };
 }
 
-export function processCompareParams(params: { a?: string; b?: string; m?: string }) {
-  if (params.a || params.b) {
-    const list = [params.a, params.b].filter(Boolean).join(',');
+export function processCompareParams(params: Record<string, string | string[] | undefined>) {
+  const a = Array.isArray(params.a) ? params.a[0] : params.a;
+  const b = Array.isArray(params.b) ? params.b[0] : params.b;
+  const m = Array.isArray(params.m) ? params.m[0] : params.m;
+
+  if (a || b) {
+    const list = [a, b].filter(Boolean).join(',');
     return { redirectUrl: `/compare?m=${encodeURIComponent(list)}` };
   }
-  const rawList = params.m ? params.m.split(',').map((s) => s.trim()).filter(Boolean) : [];
+  const rawList = m ? m.split(',').map((s) => s.trim()).filter(Boolean) : [];
   const exceedsLimit = rawList.length > 4;
   const modelKeys = rawList.slice(0, 4);
   return { redirectUrl: null, modelKeys, exceedsLimit };
@@ -111,9 +108,10 @@ export default async function ComparePage(props: PageProps) {
     }
   }
 
-  const inTokens = Math.max(0, Number(searchParams.in) || 1000);
-  const outTokens = Math.max(0, Number(searchParams.out) || 500);
-  const rpd = Math.max(0, Number(searchParams.rpd) || 1000);
+  const getParam = (val?: string | string[]) => (Array.isArray(val) ? val[0] : val);
+  const inTokens = Math.max(0, Number(getParam(searchParams.in)) || 1000);
+  const outTokens = Math.max(0, Number(getParam(searchParams.out)) || 500);
+  const rpd = Math.max(0, Number(getParam(searchParams.rpd)) || 1000);
   const callsPerMonth = rpd * 30;
 
   const showComparison = selectedModels.length >= 2;
