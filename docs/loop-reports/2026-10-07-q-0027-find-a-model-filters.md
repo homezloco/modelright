@@ -8,6 +8,7 @@
 Find-a-model filters — /models gains filters, combinable with the existing provider/sort/page params: minimum context window, maximum input $/1M, modality (vision, audio, image output), free only, and hide removed models (default on); all in URL params; empty results show "No models match — widen a filter" with a reset link — acceptance: query-builder unit tests for each filter and a combination — branch modelright/q-0027-find-a-model-filters
 
 ## What Changed
+- Fixed TypeScript build error in `src/app/models/page.tsx` by importing missing `eq` operator from `drizzle-orm`.
 - Created `src/lib/filters.ts` with pure query-builder helpers:
   - `parseModelFilters`: parses URL search parameters (`provider`, `minContext`, `maxInputPrice`, `modality`, `freeOnly`, `hideRemoved`).
   - Defaults `hideRemoved` to `true` unless explicitly overridden as `'false'` or `'0'`.
