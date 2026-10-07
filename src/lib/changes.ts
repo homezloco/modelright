@@ -179,6 +179,131 @@ export function computeChangeEvents(
   return events;
 }
 
+export interface PriceDropMover {
+  modelId: string;
+  modelSlug: string;
+  modelName: string;
+  providerSlug?: string;
+  providerName?: string;
+  /** Negative percent change, e.g. -20 for a 20% drop (largest drop across input/output). */
+  percentChange: number;
+  priceKind: 'input' | 'output';
+  oldPrice: number;
+  newPrice: number;
+  timestamp: Date;
+}
+
+export interface NewestModelMover {
+  modelId: string;
+  modelSlug: string;
+  modelName: string;
+  providerSlug?: string;
+  providerName?: string;
+  timestamp: Date;
+}
+
+export interface WeeklyMovers {
+  priceDrops: PriceDropMover[];
+  newestModels: NewestModelMover[];
+}
+
+/**
+ * Derives homepage "This week" movers from a change-event list.
+ * Pure: filters events to the trailing `days` window ending at `now`,
+ * then picks up to `limit` biggest price drops (most negative % change
+ * across input/output, one entry per model) and up to `limit` newest models.
+ */
+export function deriveWeeklyMovers(
+  events: ChangeEvent[],
+  options: { now?: Date; days?: number; limit?: number } = {}
+): WeeklyMovers {
+  const now = options.now ?? new Date();
+  const days = options.days ?? 7;
+  const limit = options.limit ?? 5;
+  const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+
+  const inWindow = events.filter(
+    (ev) => ev.timestamp >= cutoff && ev.timestamp <= now
+  );
+
+  const dropsByModel = new Map<string, PriceDropMover>();
+  for (const ev of inWindow) {
+    if (ev.type !== 'price_change') continue;
+
+    const inPct = ev.inputPriceChangePercent;
+    const outPct = ev.outputPriceChangePercent;
+    const bestPct = Math.min(inPct, outPct);
+    if (bestPct >= 0) continue;
+
+    const useInput = inPct <= outPct;
+    const mover: PriceDropMover = {
+      modelId: ev.modelId,
+      modelSlug: ev.modelSlug,
+      modelName: ev.modelName,
+      providerSlug: ev.providerSlug,
+      providerName: ev.providerName,
+      percentChange: bestPct,
+      priceKind: useInput ? 'input' : 'output',
+      oldPrice: useInput ? ev.oldInputPrice : ev.oldOutputPrice,
+      newPrice: useInput ? ev.newInputPrice : ev.newOutputPrice,
+      timestamp: ev.timestamp,
+    };
+
+    const existing = dropsByModel.get(ev.modelId);
+    if (!existing || mover.percentChange < existing.percentChange) {
+      dropsByModel.set(ev.modelId, mover);
+    }
+  }
+
+  const priceDrops = [...dropsByModel.values()]
+    .sort((a, b) =>
+      a.percentChange - b.percentChange || b.timestamp.getTime() - a.timestamp.getTime()
+    )
+    .slice(0, limit);
+
+  const seenNew = new Set<string>();
+  const newestModels: NewestModelMover[] = [];
+  const newEvents = inWindow
+    .filter((ev): ev is NewModelEvent => ev.type === 'new_model')
+    .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  for (const ev of newEvents) {
+    if (seenNew.has(ev.modelId)) continue;
+    seenNew.add(ev.modelId);
+    newestModels.push({
+      modelId: ev.modelId,
+      modelSlug: ev.modelSlug,
+      modelName: ev.modelName,
+      providerSlug: ev.providerSlug,
+      providerName: ev.providerName,
+      timestamp: ev.timestamp,
+    });
+    if (newestModels.length >= limit) break;
+  }
+
+  return { priceDrops, newestModels };
+}
+
+/**
+ * Returns the oldest timestamp observed across models and snapshots, or null
+ * when the registry is empty. Callers hide weekly movers when this is less
+ * than 7 days old (i.e. the registry has <7 days of history).
+ */
+export function earliestRegistryTimestamp(
+  models: ModelRow[],
+  snapshots: SnapshotRow[]
+): Date | null {
+  let earliest: number | null = null;
+  for (const m of models) {
+    const t = new Date(m.createdAt).getTime();
+    if (!isNaN(t) && (earliest === null || t < earliest)) earliest = t;
+  }
+  for (const s of snapshots) {
+    const t = new Date(s.capturedAt).getTime();
+    if (!isNaN(t) && (earliest === null || t < earliest)) earliest = t;
+  }
+  return earliest === null ? null : new Date(earliest);
+}
+
 export function groupEventsByDay(events: ChangeEvent[]): GroupedChanges[] {
   const groups = new Map<string, ChangeEvent[]>();
 
