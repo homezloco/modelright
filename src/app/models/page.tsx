@@ -1,6 +1,6 @@
 import { db } from '@/db/client';
 import { models, providers } from '@/db/schema';
-import { asc, desc, count } from 'drizzle-orm';
+import { asc, desc, count, eq } from 'drizzle-orm';
 import Link from 'next/link';
 import { parseModelFilters, buildModelWhereClause } from '@/lib/filters';
 
