@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { processCompareParams, parseModelParam, ModelItem } from '../src/app/compare/page';
+import { processCompareParams, parseModelParam, ModelItem } from '../src/lib/compare';
 import { calculateCost } from '../src/lib/calculator';
 
 describe('q-0026 Compare up to 4 models', () => {
