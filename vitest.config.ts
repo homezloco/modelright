@@ -2,9 +2,18 @@ import { defineConfig } from 'vitest/config';
 import path from 'node:path';
 
 export default defineConfig({
+  esbuild: {
+    jsx: 'automatic',
+  },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
+    alias: { '@': path.resolve(process.cwd(), 'src') },
+  },
+  test: {
+    coverage: {
+      provider: 'v8',
+      include: ['src/lib/**', 'src/app/api/**'],
+      thresholds: { lines: 80 },
+      reporter: ['text'],
     },
   },
 });
