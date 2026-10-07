@@ -3,12 +3,13 @@ import { db } from '@/db/client';
 import { models, providers } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { buildVsPairs } from '@/lib/compare';
+import { AGENT_SURFACE } from '@/lib/agent-surface';
 import { TASK_RULES, TaskCategory } from '@/lib/picks';
 
 export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://modelright.org';
+  const baseUrl = AGENT_SURFACE.baseUrl;
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
