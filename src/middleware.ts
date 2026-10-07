@@ -20,7 +20,12 @@ export function middleware(req: NextRequest, event: NextFetchEvent) {
         }),
       })
         .then((r) => console.log(`[mw] bot-hit ${r.status} ${req.nextUrl.pathname}`))
-        .catch((e) => console.log(`[mw] bot-hit FAIL ${req.nextUrl.pathname} ${String(e)}`))
+        .catch((e) =>
+          console.log(
+            `[mw] bot-hit FAIL ${req.nextUrl.pathname} url=${req.url} ` +
+              `cause=${JSON.stringify(e?.cause ?? null)}`
+          )
+        )
     );
   }
   const res = NextResponse.next();
