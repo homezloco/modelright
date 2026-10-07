@@ -1,27 +1,8 @@
 import { timingSafeEqual } from 'crypto';
-import { z } from 'zod';
 import { db } from '@/db/client';
 import { providers, models, ingestLog, modelSnapshots } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
-
-const modelItemSchema = z.object({
-  provider: z.object({
-    slug: z.string().min(1),
-    name: z.string().min(1),
-  }),
-  slug: z.string().min(1),
-  name: z.string().min(1),
-  contextWindow: z.number().int().positive(),
-  inputPricePerM: z.number().nonnegative().or(z.string()),
-  outputPricePerM: z.number().nonnegative().or(z.string()),
-  modalityTags: z.array(z.string()).optional().default([]),
-  availability: z.string().optional().default('available'),
-});
-
-const ingestPayloadSchema = z.object({
-  source: z.string().min(1).optional().default('api'),
-  models: z.array(modelItemSchema),
-});
+import { ingestPayloadSchema } from '@/lib/ingest-schema';
 
 function verifyBearerToken(req: Request): boolean {
   const authHeader = req.headers.get('authorization');

@@ -1,25 +1,6 @@
-import { describe, test, expect } from 'vitest';
-import { verifyBearerToken } from '@/lib/ingest';
-import { z } from 'zod';
-
-const modelItemSchema = z.object({
-  provider: z.object({
-    slug: z.string().min(1),
-    name: z.string().min(1),
-  }),
-  slug: z.string().min(1),
-  name: z.string().min(1),
-  contextWindow: z.number().int().positive(),
-  inputPricePerM: z.union([z.number(), z.string()]),
-  outputPricePerM: z.union([z.number(), z.string()]),
-  modalityTags: z.array(z.string()).optional(),
-  availability: z.string().optional(),
-});
-
-const ingestPayloadSchema = z.object({
-  source: z.string().min(1).optional().default('api'),
-  models: z.array(modelItemSchema),
-});
+import { describe, test, expect, beforeEach, afterEach } from 'vitest';
+import { verifyBearerToken } from '../src/lib/ingest';
+import { ingestPayloadSchema } from '../src/lib/ingest-schema';
 
 describe('Ingest Validation', () => {
   const originalEnv = process.env.INGEST_TOKEN;
