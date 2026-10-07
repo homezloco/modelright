@@ -2,6 +2,10 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:40 -->
+## 2026-10-07 — q-0029 Public JSON API
+[PR #40](https://github.com/homezloco/modelright/pull/40) · `modelright/q-0029-public-api` · 6 files · +444/-0
+
 <!-- pr:39 -->
 ## 2026-10-07 — q-0027 Find-a-model filters
 [PR #39](https://github.com/homezloco/modelright/pull/39) · `modelright/q-0027-find-a-model-filters` · 4 files · +336/-44 · $0.24
