@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import type { CSSProperties } from 'react';
 import { db } from '@/db/client';
@@ -102,6 +103,7 @@ export default async function AdminPage(props: PageProps) {
   if (!verifyTokenParam(sp.token, process.env.ADMIN_TOKEN)) {
     notFound();
   }
+  const token = typeof sp.token === 'string' ? sp.token : '';
 
   let modelRows: ModelStatusRow[] = [];
   let providerCount = 0;
@@ -155,7 +157,10 @@ export default async function AdminPage(props: PageProps) {
         Admin — Ops Dashboard
       </h1>
       <p style={{ color: '#94a3b8', marginTop: '0.5rem', marginBottom: '1.5rem' }}>
-        Registry health, ingest pipeline status, and snapshot volume. Ops-only; unlisted.
+        Registry health, ingest pipeline status, and snapshot volume. Ops-only; unlisted.{' '}
+        <Link href={`/admin/analytics?token=${encodeURIComponent(token)}`} style={{ color: '#38bdf8' }}>
+          analytics →
+        </Link>
       </p>
 
       {stale && (

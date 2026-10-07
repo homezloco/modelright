@@ -3,8 +3,9 @@ import { createMcpHandler } from "mcp-handler";
 import { z } from "zod";
 import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { db } from "@/db/client";
-import { ingestLog, modelSnapshots, models, providers } from "@/db/schema";
+import { ingestLog, mcpCalls, modelSnapshots, models, providers } from "@/db/schema";
 import { checkRateLimit } from "@/lib/rateLimit";
+import { analyticsSalt, visitorHash } from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
@@ -251,6 +252,42 @@ function clientIp(req: Request): string {
   return xff?.split(",")[0]?.trim() || "unknown";
 }
 
+/** Counts a JSON-RPC call into mcp_calls (q-0042). Best-effort: parses
+ *  the already-cloned request body for method/tool, inserts, and swallows
+ *  every failure — analytics must never break an MCP call. */
+async function recordMcpCall(req: Request, ok: boolean): Promise<void> {
+  try {
+    if (!process.env.DATABASE_URL) return;
+    const body: unknown = await req.json();
+    const msg = Array.isArray(body) ? body[0] : body;
+    if (!msg || typeof msg !== "object") return;
+    const raw = msg as { method?: unknown; params?: unknown };
+    const method = typeof raw.method === "string" ? raw.method.slice(0, 60) : "unknown";
+    const params = raw.params;
+    const tool =
+      method === "tools/call" &&
+      params &&
+      typeof params === "object" &&
+      typeof (params as { name?: unknown }).name === "string"
+        ? ((params as { name: string }).name).slice(0, 60)
+        : null;
+    const ua = req.headers.get("user-agent") ?? "";
+    await db.insert(mcpCalls).values({
+      method,
+      tool,
+      visitorHash: await visitorHash(
+        clientIp(req),
+        ua,
+        new Date().toISOString().slice(0, 10),
+        analyticsSalt()
+      ),
+      ok,
+    });
+  } catch {
+    /* analytics must never fail the request */
+  }
+}
+
 async function metered(req: Request) {
   // Public read-only surface — modest per-IP budget (60 burst, ~60/min
   // sustained) so one caller can't starve the shared Postgres.
@@ -264,7 +301,12 @@ async function metered(req: Request) {
       { status: 429, headers: { "Retry-After": String(retryAfterSeconds) } }
     );
   }
-  return handler(req);
+  // Clone before the handler consumes the body — recordMcpCall reads the
+  // JSON-RPC envelope off the clone after the response is produced.
+  const clone = req.clone();
+  const res = await handler(req);
+  void recordMcpCall(clone, res.ok).catch(() => {});
+  return res;
 }
 
 // Wildcard CORS: the surface is unauthenticated + read-only, so browser-based

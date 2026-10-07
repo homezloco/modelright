@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import HeaderSearch from '@/components/HeaderSearch';
+import AnalyticsBeacon from '@/components/AnalyticsBeacon';
 import { db } from '@/db/client';
 import { ingestLog } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
@@ -70,6 +71,7 @@ export default async function RootLayout({
         <main style={{ flex: 1, maxWidth: '1200px', width: '100%', margin: '0 auto', padding: '2rem 1rem', boxSizing: 'border-box' }}>
           {children}
         </main>
+        <AnalyticsBeacon />
 
         <footer style={{ borderTop: '1px solid #1e293b', backgroundColor: '#0f172a', padding: '1.5rem 2rem', marginTop: 'auto', color: '#64748b', fontSize: '0.875rem' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
