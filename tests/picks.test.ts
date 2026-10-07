@@ -116,3 +116,66 @@ describe('q-0028 Task Picks Selection Rules', () => {
     expect(chatPicks.some((m) => m.slug === 'old-model')).toBe(false);
   });
 });
+
+describe('q-0043 coding pick AA benchmark preference', () => {
+  const base = (over: Partial<TaskPickModel>): TaskPickModel => ({
+    id: 'x',
+    name: 'X',
+    slug: 'x',
+    providerName: 'P',
+    providerSlug: 'p',
+    contextWindow: 128000,
+    inputPricePerM: '1.00',
+    outputPricePerM: '2.00',
+    modalityTags: ['text'],
+    status: 'active',
+    ...over,
+  });
+
+  // pa..pe have 2+ listed models; 'niche' has one, so the plain
+  // provider-count rule drops it entirely.
+  const codingFixture: TaskPickModel[] = [
+    base({ id: 'a1', slug: 'a1', providerSlug: 'pa', outputPricePerM: '1.00' }),
+    base({ id: 'a2', slug: 'a2', providerSlug: 'pa', outputPricePerM: '1.10' }),
+    base({ id: 'b1', slug: 'b1', providerSlug: 'pb', outputPricePerM: '1.20' }),
+    base({ id: 'b2', slug: 'b2', providerSlug: 'pb', outputPricePerM: '1.30' }),
+    base({ id: 'c1', slug: 'c1', providerSlug: 'pc', outputPricePerM: '1.40' }),
+    base({ id: 'c2', slug: 'c2', providerSlug: 'pc', outputPricePerM: '1.50' }),
+    base({ id: 'd1', slug: 'd1', providerSlug: 'pd', outputPricePerM: '1.60' }),
+    base({ id: 'd2', slug: 'd2', providerSlug: 'pd', outputPricePerM: '1.70' }),
+    base({ id: 'e1', slug: 'e1', providerSlug: 'pe', outputPricePerM: '1.80' }),
+    base({ id: 'e2', slug: 'e2', providerSlug: 'pe', outputPricePerM: '1.90' }),
+    base({ id: 'n1', slug: 'niche-star', providerSlug: 'niche', outputPricePerM: '5.00', codingIndex: 88 }),
+    base({ id: 'a3', slug: 'a3', providerSlug: 'pa', outputPricePerM: '9.00', codingIndex: 40 }),
+    base({ id: 'gone', slug: 'gone', providerSlug: 'pa', status: 'removed', codingIndex: 99 }),
+  ];
+
+  test('models carrying a coding index rank first, highest index wins', () => {
+    const picks = TASK_RULES['coding'].filterAndSort(codingFixture);
+    // niche-star would be excluded by the provider-count rule alone, but
+    // its coding index outranks every fallback pick.
+    expect(picks[0].slug).toBe('niche-star');
+    expect(picks[1].slug).toBe('a3'); // 40 — second among benchmarked
+  });
+
+  test('unbenchmarked models follow in the existing provider-count order', () => {
+    const picks = TASK_RULES['coding'].filterAndSort(codingFixture);
+    const fallback = picks.slice(2).map((m) => m.slug);
+    expect(fallback).toEqual(['a1', 'a2', 'b1', 'b2', 'c1', 'c2', 'd1', 'd2']);
+    expect(picks.some((m) => m.slug === 'gone')).toBe(false); // removed never ranks
+    expect(picks.length).toBeLessThanOrEqual(10);
+  });
+
+  test('with no coding indices present, matches the existing rule ordering', () => {
+    const bare = codingFixture.map(({ codingIndex, ...m }) => m);
+    const coding = TASK_RULES['coding'].filterAndSort(bare).map((m) => m.id);
+    const chat = TASK_RULES['chat'].filterAndSort(bare).map((m) => m.id);
+    expect(coding).toEqual(chat);
+    // niche excluded entirely without its benchmark
+    expect(coding).not.toContain('n1');
+  });
+
+  test('coding rule text describes the benchmark-then-fallback blend', () => {
+    expect(TASK_RULES['coding'].ruleText).toContain('coding index');
+  });
+});

@@ -34,7 +34,7 @@ describe('q-0040 sitemap discovery completeness', () => {
   it('includes the new static routes', async () => {
     sharedQueue = [[], []];
     const urls = (await sitemap()).map((e) => e.url);
-    for (const path of ['/pick', '/changes', '/api', '/calculator']) {
+    for (const path of ['/pick', '/changes', '/api', '/calculator', '/rankings']) {
       expect(urls.some((u) => u.endsWith(path))).toBe(true);
     }
   });
@@ -90,6 +90,7 @@ describe('q-0040 llms.txt discovery completeness', () => {
     // Task-pick pages
     expect(body).toContain('/pick');
     expect(body).toContain('/pick/{task}');
+    expect(body).toContain('/rankings');
     for (const task of Object.keys(TASK_RULES)) {
       expect(body).toContain(task);
     }

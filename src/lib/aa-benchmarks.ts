@@ -60,3 +60,33 @@ export function extractAABenchmarks(
   }
   return null;
 }
+
+interface ModelSnapshotRow extends SnapshotLike {
+  modelId: string;
+}
+
+/**
+ * Batch variant of extractAABenchmarks: rows are expected globally
+ * newest-first (ORDER BY captured_at DESC) and are grouped by modelId, so
+ * each model gets the extraction from ITS newest benchmarked snapshot —
+ * the same semantics the detail page gets per model. Models with no
+ * renderable AA fields are absent from the map.
+ */
+export function extractAABenchmarksByModel(
+  snapshotRows: ModelSnapshotRow[] | null | undefined
+): Map<string, AABenchmarks> {
+  const rowsByModel = new Map<string, SnapshotLike[]>();
+  for (const row of snapshotRows ?? []) {
+    if (!row || typeof row.modelId !== 'string') continue;
+    const list = rowsByModel.get(row.modelId);
+    if (list) list.push(row);
+    else rowsByModel.set(row.modelId, [row]);
+  }
+
+  const out = new Map<string, AABenchmarks>();
+  for (const [modelId, rows] of rowsByModel) {
+    const benchmarks = extractAABenchmarks(rows);
+    if (benchmarks) out.set(modelId, benchmarks);
+  }
+  return out;
+}
