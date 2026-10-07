@@ -2,6 +2,12 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:38 -->
+## 2026-10-07 — q-0026 Compare up to 4 models
+[PR #38](https://github.com/homezloco/modelright/pull/38) · `modelright/q-0026-compare-four` · 5 files · +298/-162 · $0.65
+
+Agent's note: [docs/loop-reports/2026-10-06-q-0026-compare-four.md](docs/loop-reports/2026-10-06-q-0026-compare-four.md)
+
 <!-- pr:37 -->
 ## 2026-10-06 — q-0025 Cost calculator
 [PR #37](https://github.com/homezloco/modelright/pull/37) · `modelright/q-0025-cost-calculator` · 7 files · +255/-0 · $0.06
