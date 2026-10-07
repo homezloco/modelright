@@ -53,7 +53,7 @@ export default async function TaskPickPage(props: PageProps) {
       .innerJoin(providers, eq(models.providerId, providers.id))
       .where(ne(models.status, 'removed'));
 
-    dbModels = results.map((r) => ({
+    dbModels = results.map((r: any) => ({
       id: r.id,
       name: r.name,
       slug: r.slug,
