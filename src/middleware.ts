@@ -10,27 +10,23 @@ import { classifyBot } from '@/lib/analytics';
 export function middleware(req: NextRequest, event: NextFetchEvent) {
   const ua = req.headers.get('user-agent') ?? '';
   if (classifyBot(ua)) {
+    // Self-fetch must use plain HTTP: req.url is rebuilt as
+    // https://localhost:PORT behind the proxy, and TLS against the
+    // local listener fails with ERR_SSL_WRONG_VERSION_NUMBER.
+    const hitUrl = new URL('/api/bot-hit', req.url);
+    hitUrl.protocol = 'http:';
     event.waitUntil(
-      fetch(new URL('/api/bot-hit', req.url), {
+      fetch(hitUrl, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           path: req.nextUrl.pathname.slice(0, 300),
           ua: ua.slice(0, 500),
         }),
-      })
-        .then((r) => console.log(`[mw] bot-hit ${r.status} ${req.nextUrl.pathname}`))
-        .catch((e) =>
-          console.log(
-            `[mw] bot-hit FAIL ${req.nextUrl.pathname} url=${req.url} ` +
-              `cause=${JSON.stringify(e?.cause ?? null)}`
-          )
-        )
+      }).catch((e) => console.log(`[mw] bot-hit FAIL ${req.nextUrl.pathname} ${String(e?.cause ?? e)}`))
     );
   }
-  const res = NextResponse.next();
-  res.headers.set('x-mr-mw', '1');
-  return res;
+  return NextResponse.next();
 }
 
 export const config = {
