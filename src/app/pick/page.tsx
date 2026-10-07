@@ -32,7 +32,7 @@ export default function PickIndexPage() {
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
                 display: 'flex',
                 flexDirection: 'column',
-                justify: 'space-between',
+                justifyContent: 'space-between',
               }}
             >
               <div>
