@@ -1,7 +1,7 @@
 name: ci
 on:
   push:
-    branches: [main, "modelright/**"]
+    branches: [main, "modelright/**", "growth/**"]
   pull_request:
 jobs:
   build:

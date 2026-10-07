@@ -8,10 +8,10 @@ export const modelItemSchema = z.object({
   slug: z.string().min(1),
   name: z.string().min(1),
   contextWindow: z.number().int().positive(),
-  inputPricePerM: z.number().nonnegative().or(z.string()),
-  outputPricePerM: z.number().nonnegative().or(z.string()),
-  modalityTags: z.array(z.string()).optional().default([]),
-  availability: z.string().optional().default('available'),
+  inputPricePerM: z.union([z.number(), z.string()]),
+  outputPricePerM: z.union([z.number(), z.string()]),
+  modalityTags: z.array(z.string()).optional(),
+  availability: z.string().optional(),
 });
 
 export const ingestPayloadSchema = z.object({

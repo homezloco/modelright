@@ -1,0 +1,7 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "id": "0002_delete_seed_fixtures_if_synced",
+  "prevId": "0001_availability_fields",
+  "comments": true
+}

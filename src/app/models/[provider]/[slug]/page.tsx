@@ -3,6 +3,10 @@ import { notFound } from 'next/navigation';
 import { db } from '@/db/client';
 import { providers, models, modelSnapshots } from '@/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
+import { PriceHistoryChart } from '@/components/PriceHistoryChart';
+import { getPriceChanges } from '@/lib/price-history';
+import { fetchModelRadar, findRadarScore } from '@/lib/model-radar';
+import { CostCalculator } from '@/components/CostCalculator';
 
 interface ModelDetailPageProps {
   params: {
@@ -10,91 +14,6 @@ interface ModelDetailPageProps {
     slug: string;
   };
 }
-
-// Fallback sample models used when DB has not been seeded yet
-const SAMPLE_MODELS: Record<string, {
-  name: string;
-  providerName: string;
-  contextWindow: number;
-  inputPricePerM: string;
-  outputPricePerM: string;
-  modalityTags: string[];
-  updatedAt: string;
-  snapshots: Array<{
-    id: string;
-    capturedAt: string;
-    availability: string;
-    inputPricePerM: string;
-    outputPricePerM: string;
-    source: string;
-  }>;
-}> = {
-  'openai/gpt-4o': {
-    name: 'GPT-4o',
-    providerName: 'OpenAI',
-    contextWindow: 128000,
-    inputPricePerM: '$2.50',
-    outputPricePerM: '$10.00',
-    modalityTags: ['text', 'image', 'audio'],
-    updatedAt: '2026-10-01T12:00:00Z',
-    snapshots: [
-      {
-        id: 'snap-1',
-        capturedAt: '2026-10-01 12:00:00 UTC',
-        availability: 'available',
-        inputPricePerM: '$2.50',
-        outputPricePerM: '$10.00',
-        source: 'OpenAI API Ingest',
-      },
-      {
-        id: 'snap-2',
-        capturedAt: '2026-09-30 12:00:00 UTC',
-        availability: 'available',
-        inputPricePerM: '$2.50',
-        outputPricePerM: '$10.00',
-        source: 'OpenAI API Ingest',
-      },
-    ],
-  },
-  'anthropic/claude-3-5-sonnet': {
-    name: 'Claude 3.5 Sonnet',
-    providerName: 'Anthropic',
-    contextWindow: 200000,
-    inputPricePerM: '$3.00',
-    outputPricePerM: '$15.00',
-    modalityTags: ['text', 'image'],
-    updatedAt: '2026-10-01T12:00:00Z',
-    snapshots: [
-      {
-        id: 'snap-3',
-        capturedAt: '2026-10-01 12:00:00 UTC',
-        availability: 'available',
-        inputPricePerM: '$3.00',
-        outputPricePerM: '$15.00',
-        source: 'Anthropic API Ingest',
-      },
-    ],
-  },
-  'openrouter/meta-llama-3-70b-instruct': {
-    name: 'Meta Llama 3 70B Instruct',
-    providerName: 'OpenRouter',
-    contextWindow: 8192,
-    inputPricePerM: '$0.59',
-    outputPricePerM: '$0.79',
-    modalityTags: ['text'],
-    updatedAt: '2026-10-01T12:00:00Z',
-    snapshots: [
-      {
-        id: 'snap-4',
-        capturedAt: '2026-10-01 12:00:00 UTC',
-        availability: 'available',
-        inputPricePerM: '$0.59',
-        outputPricePerM: '$0.79',
-        source: 'OpenRouter API Ingest',
-      },
-    ],
-  },
-};
 
 async function getModelData(providerSlug: string, modelSlug: string) {
   try {
@@ -142,11 +61,13 @@ async function getModelData(providerSlug: string, modelSlug: string) {
       contextWindow: modelRec.contextWindow,
       inputPricePerM: `$${Number(modelRec.inputPricePerM).toFixed(2)}`,
       outputPricePerM: `$${Number(modelRec.outputPricePerM).toFixed(2)}`,
+      numericInputPrice: Number(modelRec.inputPricePerM),
+      numericOutputPrice: Number(modelRec.outputPricePerM),
       modalityTags: modelRec.modalityTags || [],
       updatedAt: modelRec.updatedAt ? new Date(modelRec.updatedAt).toISOString() : '',
       snapshots: snapshotRows.map((s: any) => ({
         id: s.id,
-        capturedAt: new Date(s.capturedAt).toISOString().replace('T', ' ').substring(0, 19) + ' UTC',
+        capturedAt: new Date(s.capturedAt).toISOString(),
         availability: s.availability,
         inputPricePerM: `$${Number(s.inputPricePerM).toFixed(2)}`,
         outputPricePerM: `$${Number(s.outputPricePerM).toFixed(2)}`,
@@ -157,8 +78,7 @@ async function getModelData(providerSlug: string, modelSlug: string) {
     };
   } catch (error) {
     // Fall back to sample data if DB query fails or isn't seeded
-    const key = `${providerSlug.toLowerCase()}/${modelSlug.toLowerCase()}`;
-    return SAMPLE_MODELS[key] || null;
+    return null;
   }
 }
 
@@ -168,6 +88,8 @@ export default async function ModelDetailPage({ params }: ModelDetailPageProps) 
   if (!model) {
     notFound();
   }
+
+  const radarScore = findRadarScore(await fetchModelRadar(), params.provider, params.slug);
 
   return (
     <main style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif', maxWidth: '800px', margin: '0 auto' }}>
@@ -190,19 +112,19 @@ export default async function ModelDetailPage({ params }: ModelDetailPageProps) 
       <section style={{ marginBottom: '2.5rem' }}>
         <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Specifications</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
-          <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px' }}>
+          <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
             <div style={{ fontSize: '0.85rem', color: '#666' }}>Context Window</div>
             <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
               {model.contextWindow.toLocaleString()} tokens
             </div>
           </div>
-          <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px' }}>
+          <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
             <div style={{ fontSize: '0.85rem', color: '#666' }}>Input Price / 1M</div>
             <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
               {model.inputPricePerM}
             </div>
           </div>
-          <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px' }}>
+          <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
             <div style={{ fontSize: '0.85rem', color: '#666' }}>Output Price / 1M</div>
             <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
               {model.outputPricePerM}
@@ -233,6 +155,74 @@ export default async function ModelDetailPage({ params }: ModelDetailPageProps) 
         )}
       </section>
 
+      {radarScore && (
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Benchmarks</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+            <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
+              <div style={{ fontSize: '0.85rem', color: '#666' }}>Radar Score</div>
+              <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
+                {radarScore.score}/10
+              </div>
+            </div>
+            <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
+              <div style={{ fontSize: '0.85rem', color: '#666' }}>Latency</div>
+              <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
+                {radarScore.latencyMs.toLocaleString()} ms
+              </div>
+            </div>
+            {radarScore.estCostUsd != null && (
+              <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
+                <div style={{ fontSize: '0.85rem', color: '#666' }}>Est. Cost / Run</div>
+                <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
+                  ${radarScore.estCostUsd.toFixed(4)}
+                </div>
+              </div>
+            )}
+          </div>
+          {radarScore.notes && (
+            <p style={{ color: '#555', fontSize: '0.9rem', marginTop: '1rem' }}>{radarScore.notes}</p>
+          )}
+          <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.75rem' }}>
+            Benchmark data: Artificial Analysis · via{' '}
+            <a href="https://livegraph.ai/model-radar" style={{ color: '#0066cc' }}>
+              LiveGraph Model Radar
+            </a>
+          </p>
+        </section>
+      )}
+
+      <section style={{ marginBottom: '2.5rem' }}>
+        <CostCalculator
+          modelName={model.name}
+          initialInputPricePerM={model.numericInputPrice}
+          initialOutputPricePerM={model.numericOutputPrice}
+        />
+      </section>
+
+      <section style={{ marginBottom: '2.5rem' }}>
+        <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Price History</h2>
+        {model.snapshots.length === 0 ? (
+          <p style={{ color: '#666' }}>No snapshots yet — price history appears after the first syncs.</p>
+        ) : (
+          <>
+            <PriceHistoryChart snapshots={model.snapshots} />
+            {getPriceChanges(model.snapshots).map((c) => (
+              <p key={c.id} style={{ color: '#555', fontSize: '0.9rem', margin: '0.25rem 0' }}>
+                Price changed {c.date}:{' '}
+                {c.inputChanged && <>input ${c.inputFrom.toFixed(2)} → ${c.inputTo.toFixed(2)}</>}
+                {c.inputChanged && c.outputChanged && ', '}
+                {c.outputChanged && <>output ${c.outputFrom.toFixed(2)} → ${c.outputTo.toFixed(2)}</>}
+                {' '}/1M
+              </p>
+            ))}
+            {getPriceChanges(model.snapshots).length === 0 && (
+              <p style={{ color: '#555', fontSize: '0.9rem' }}>No price changes recorded.</p>
+            )}
+          </>
+        )}
+      </section>
+
       <section style={{ marginBottom: '2.5rem' }}>
         <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Snapshot History & Ingest Provenance</h2>
         {model.snapshots.length === 0 ? (
@@ -252,7 +242,7 @@ export default async function ModelDetailPage({ params }: ModelDetailPageProps) 
               {model.snapshots.map((snap: any) => (
                 <tr key={snap.id} style={{ borderBottom: '1px solid #eee' }}>
                   <td style={{ padding: '0.5rem', fontFamily: 'monospace', fontSize: '0.9rem' }}>
-                    {snap.capturedAt}
+                    {snap.capturedAt.replace('T', ' ').substring(0, 19)} UTC
                   </td>
                   <td style={{ padding: '0.5rem' }}>
                     <span
