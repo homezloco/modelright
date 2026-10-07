@@ -75,3 +75,81 @@ export function resolvePresetKeys(
   const keys = preset.keys.filter((k) => have.has(k.toLowerCase()));
   return keys.length >= 2 ? keys : null;
 }
+
+/** URL-safe pair form: provider--slug joined with -vs- */
+export function vsSlugOf(providerSlug: string, slug: string): string {
+  return `${providerSlug}--${slug}`;
+}
+
+export function vsPairPath(aKey: string, bKey: string): string {
+  const [ap, as] = aKey.split('/');
+  const [bp, bs] = bKey.split('/');
+  return `/compare/${vsSlugOf(ap, as)}-vs-${vsSlugOf(bp, bs)}`;
+}
+
+/**
+ * Parse `/compare/[pair]` slugs like `openai--gpt-4o-vs-anthropic--claude-sonnet`
+ * into canonical `provider/slug` keys. Returns null on any malformed part.
+ */
+export function parseVsSlug(pair: string): [string, string] | null {
+  const sides = pair.split('-vs-');
+  if (sides.length !== 2) return null;
+  const keys = sides.map((side) => {
+    const idx = side.indexOf('--');
+    if (idx <= 0 || idx === side.length - 2) return null;
+    return `${side.slice(0, idx)}/${side.slice(idx + 2)}`.toLowerCase();
+  });
+  return keys[0] && keys[1] ? [keys[0], keys[1]] : null;
+}
+
+export function priceTier(inputPricePerM: string | number | null): string {
+  const p = typeof inputPricePerM === 'string' ? parseFloat(inputPricePerM) : inputPricePerM ?? NaN;
+  if (!isFinite(p)) return 'unknown';
+  if (p === 0) return 'free';
+  if (p < 1) return 'budget';
+  if (p < 10) return 'mid';
+  return 'premium';
+}
+
+export interface VsPairCandidate {
+  providerSlug: string;
+  slug: string;
+  inputPricePerM: string;
+  updatedAt: Date | null;
+}
+
+/**
+ * Pairs for the sitemap: all unordered pairs within the same price tier drawn
+ * from the `recentCount` most recently updated models, capped at `maxPairs`.
+ */
+export function buildVsPairs(
+  candidates: VsPairCandidate[],
+  { recentCount = 30, maxPairs = 60 }: { recentCount?: number; maxPairs?: number } = {}
+): string[] {
+  const recent = [...candidates]
+    .sort((a, b) => (b.updatedAt?.getTime() ?? 0) - (a.updatedAt?.getTime() ?? 0))
+    .slice(0, recentCount);
+
+  const byTier = new Map<string, VsPairCandidate[]>();
+  for (const m of recent) {
+    const tier = priceTier(m.inputPricePerM);
+    const list = byTier.get(tier) ?? [];
+    list.push(m);
+    byTier.set(tier, list);
+  }
+
+  const pairs: string[] = [];
+  for (const tierModels of byTier.values()) {
+    for (let i = 0; i < tierModels.length && pairs.length < maxPairs; i++) {
+      for (let j = i + 1; j < tierModels.length && pairs.length < maxPairs; j++) {
+        pairs.push(
+          vsPairPath(
+            `${tierModels[i].providerSlug}/${tierModels[i].slug}`,
+            `${tierModels[j].providerSlug}/${tierModels[j].slug}`
+          )
+        );
+      }
+    }
+  }
+  return pairs;
+}

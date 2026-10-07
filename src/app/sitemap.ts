@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next';
 import { db } from '@/db/client';
 import { models, providers } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { buildVsPairs } from '@/lib/compare';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,6 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let modelRoutes: MetadataRoute.Sitemap = [];
   let providerRoutes: MetadataRoute.Sitemap = [];
+  let pairRoutes: MetadataRoute.Sitemap = [];
 
   try {
     const providerList = await db
@@ -57,6 +59,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .select({
         providerSlug: providers.slug,
         modelSlug: models.slug,
+        inputPricePerM: models.inputPricePerM,
         updatedAt: models.updatedAt,
       })
       .from(models)
@@ -68,9 +71,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.7,
     }));
+
+    pairRoutes = buildVsPairs(
+      modelList.map((m: { providerSlug: string; modelSlug: string; inputPricePerM: string; updatedAt: Date | null }) => ({
+        providerSlug: m.providerSlug,
+        slug: m.modelSlug,
+        inputPricePerM: m.inputPricePerM,
+        updatedAt: m.updatedAt,
+      })),
+      { recentCount: 30, maxPairs: 60 }
+    ).map((path) => ({
+      url: `${baseUrl}${path}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    }));
   } catch (error) {
     console.error('Failed to generate sitemap routes:', error);
   }
 
-  return [...staticRoutes, ...providerRoutes, ...modelRoutes];
+  return [...staticRoutes, ...providerRoutes, ...modelRoutes, ...pairRoutes];
 }
