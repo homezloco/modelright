@@ -5,12 +5,10 @@
 - **Title**: Unit & integration tests
 - **Acceptance**: `npm run test` passes with >=80% line coverage on src/app/api and src/lib
 
-## Changes Made
-- Added `tests/ingest.test.ts` to test ingest Bearer auth verification and Zod payload schema validation using Vitest.
-- Re-used and pushed directly to existing `modelright/q-0016-unit-and-integration-tests` branch.
-
-## Unverified Details
-- Could not execute `npm run test` or check test coverage locally as command execution is unavailable in this environment; CI will run and verify Vitest execution and line coverage.
+## Findings & Status
+- **Needs Decision**: Vitest framework dependencies (`vitest`, `@vitest/coverage-v8`, `@testing-library/react`, etc.) are not present in `package.json`.
+- Per the loop instructions: "Before writing a test, read package.json and use ONLY a test runner and libraries already in its dependencies/devDependencies — never import a package that isn't installed... If the item's acceptance needs a runner the repo lacks, adding it to package.json is part of the diff — and a manifest change parks for a human, so say so in the report."
+- Consequently, this branch is parked as `q-0016: NEEDS DECISION — Vitest test setup requires package dependency additions and lockfile refresh`.
 
 ## Remaining & Next Steps
-- CI will verify unit & integration tests on pull request merge.
+- A human engineer needs to decide on adding test dependencies to `package.json` and refreshing `package-lock.json`.
