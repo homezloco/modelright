@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
 import { db } from '@/db/client';
 import { models, providers } from '@/db/schema';
 import { eq, ne } from 'drizzle-orm';
@@ -8,13 +9,12 @@ import { TASK_RULES, TaskCategory, TaskPickModel } from '@/lib/picks';
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
-  params: Promise<{
+  params: {
     task: string;
-  }>;
+  };
 }
 
-export async function generateMetadata(props: PageProps) {
-  const params = await props.params;
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const taskKey = params.task as TaskCategory;
   const rule = TASK_RULES[taskKey];
   if (!rule) return { title: 'Task Not Found | Modelright' };
@@ -24,8 +24,7 @@ export async function generateMetadata(props: PageProps) {
   };
 }
 
-export default async function TaskPickPage(props: PageProps) {
-  const params = await props.params;
+export default async function TaskPickPage({ params }: PageProps) {
   const taskKey = params.task as TaskCategory;
   const rule = TASK_RULES[taskKey];
 
