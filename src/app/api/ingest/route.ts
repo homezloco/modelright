@@ -1,25 +1,8 @@
-import { z } from 'zod';
+import { ingestPayloadSchema } from '@/lib/ingest-schema';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { processIngestPayload, verifyBearerToken } from '@/lib/ingest';
 
-const modelItemSchema = z.object({
-  provider: z.object({
-    slug: z.string().min(1),
-    name: z.string().min(1),
-  }),
-  slug: z.string().min(1),
-  name: z.string().min(1),
-  contextWindow: z.number().int().positive(),
-  inputPricePerM: z.union([z.number(), z.string()]),
-  outputPricePerM: z.union([z.number(), z.string()]),
-  modalityTags: z.array(z.string()).optional(),
-  availability: z.string().optional(),
-});
 
-const ingestPayloadSchema = z.object({
-  source: z.string().min(1).optional().default('api'),
-  models: z.array(modelItemSchema),
-});
 
 export async function POST(req: Request) {
   if (!verifyBearerToken(req)) {
