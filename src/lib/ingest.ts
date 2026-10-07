@@ -3,6 +3,7 @@ import { db } from '@/db/client';
 import { providers, models, ingestLog, modelSnapshots } from '@/db/schema';
 import { eq, and, notInArray } from 'drizzle-orm';
 import { fetchOpenRouterCatalog, normalizeOpenRouter } from '@/lib/sources/openrouter';
+import { fetchAAModels, normalizeAAModels } from '@/lib/sources/artificial-analysis';
 
 export interface IngestModelItem {
   provider: {
@@ -18,9 +19,61 @@ export interface IngestModelItem {
   availability?: string;
 }
 
-export async function processIngestPayload(source: string, modelItems: IngestModelItem[]): Promise<{ received: number; upserted: number }> {
+export interface IngestOptions {
+  /**
+   * Enrichment mode: never insert new rows (source may describe models
+   * outside the authoritative catalog), and on update only touch
+   * liveness columns (status, lastSeenAt/lastSeenOk, updatedAt) — name, pricing,
+   * contextWindow, and modalityTags stay owned by the primary source.
+   * The snapshot row still records the full item as rawPayload.
+   */
+  enrich?: boolean;
+}
+
+export function deriveStatus(availability?: string): string {
+  return availability === 'available' || availability === 'ok'
+    ? 'ok'
+    : availability
+      ? 'degraded'
+      : 'unknown';
+}
+
+export function buildModelUpdateSet(
+  item: IngestModelItem,
+  now: Date,
+  opts?: IngestOptions
+): Record<string, unknown> {
+  const newStatus = deriveStatus(item.availability);
+  const isOk = newStatus === 'ok';
+  if (opts?.enrich) {
+    return {
+      lastSeenAt: now,
+      ...(isOk ? { lastSeenOk: now } : {}),
+      status: newStatus,
+      updatedAt: now,
+    };
+  }
+  return {
+    name: item.name,
+    contextWindow: item.contextWindow,
+    inputPricePerM: item.inputPricePerM.toString(),
+    outputPricePerM: item.outputPricePerM.toString(),
+    modalityTags: item.modalityTags || [],
+    lastSeenAt: now,
+    ...(isOk ? { lastSeenOk: now } : {}),
+    status: newStatus,
+    updatedAt: now,
+  };
+}
+
+export async function processIngestPayload(
+  source: string,
+  modelItems: IngestModelItem[],
+  opts?: IngestOptions
+): Promise<{ received: number; upserted: number; skipped: number }> {
   const receivedCount = modelItems.length;
   let upsertedCount = 0;
+  let skippedCount = 0;
 
   try {
     for (const item of modelItems) {
@@ -65,23 +118,18 @@ export async function processIngestPayload(source: string, modelItems: IngestMod
       let modelRecord = modelRecords[0];
 
       const now = new Date();
-      const isOk = item.availability === 'available' || item.availability === 'ok';
-      const newStatus = isOk ? 'ok' : item.availability ? 'degraded' : 'unknown';
+      const newStatus = deriveStatus(item.availability);
+      const isOk = newStatus === 'ok';
+
+      if (!modelRecord && opts?.enrich) {
+        skippedCount++;
+        continue;
+      }
 
       if (modelRecord) {
         const [updatedModel] = await db
           .update(models)
-          .set({
-            name: item.name,
-            contextWindow: item.contextWindow,
-            inputPricePerM: inputPriceStr,
-            outputPricePerM: outputPriceStr,
-            modalityTags: item.modalityTags || [],
-            lastSeenAt: now,
-            ...(isOk ? { lastSeenOk: now } : {}),
-            status: newStatus,
-            updatedAt: now,
-          })
+          .set(buildModelUpdateSet(item, now, opts) as never)
           .where(eq(models.id, modelRecord.id))
           .returning();
         modelRecord = updatedModel;
@@ -124,6 +172,7 @@ export async function processIngestPayload(source: string, modelItems: IngestMod
     return {
       received: receivedCount,
       upserted: upsertedCount,
+      skipped: skippedCount,
     };
   } catch (err) {
     await db.insert(ingestLog).values({
@@ -230,4 +279,35 @@ export function verifyCronSecret(req: Request): 'ok' | 'unset' | 'unauthorized' 
   }
 
   return 'unauthorized';
+}
+
+/**
+ * Artificial Analysis leg: enrich-only — AA rows update liveness and land
+ * benchmark/speed fields on the snapshot's rawPayload, but never write
+ * pricing/context/name on existing rows and never insert AA-only models
+ * (OpenRouter stays the pricing/availability authority).
+ */
+export async function syncArtificialAnalysisCatalog(): Promise<{ fetched: number; upserted: number; skipped: number }> {
+  const raw = await fetchAAModels();
+  const normalized = normalizeAAModels(raw);
+  const { upserted, skipped } = await processIngestPayload('artificial-analysis', normalized, { enrich: true });
+  return { fetched: raw.length, upserted, skipped };
+}
+
+export async function syncAllSources(): Promise<{
+  openrouter: { fetched: number; upserted: number; removed: number };
+  artificialAnalysis: { fetched: number; upserted: number; skipped: number } | { error: string };
+}> {
+  const openrouter = await syncOpenRouterCatalog();
+
+  if (!process.env.AA_API_KEY) {
+    return { openrouter, artificialAnalysis: { error: 'AA_API_KEY not configured' } };
+  }
+
+  try {
+    const artificialAnalysis = await syncArtificialAnalysisCatalog();
+    return { openrouter, artificialAnalysis };
+  } catch (err) {
+    return { openrouter, artificialAnalysis: { error: String(err) } };
+  }
 }

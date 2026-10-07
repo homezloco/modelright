@@ -1,4 +1,4 @@
-import { verifyCronSecret, syncOpenRouterCatalog } from '@/lib/ingest';
+import { verifyCronSecret, syncAllSources } from '@/lib/ingest';
 
 export async function POST(req: Request) {
   const authStatus = verifyCronSecret(req);
@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const result = await syncOpenRouterCatalog();
+    const result = await syncAllSources();
     return Response.json(result);
   } catch (err) {
     return Response.json({ error: 'Sync failed', details: String(err) }, { status: 500 });
