@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { mcpServerCard } from '@/lib/agent-surface';
+import { openapiDocument } from '@/lib/agent-surface';
 
 export const revalidate = 3600;
 
 export function GET() {
-  return NextResponse.json(mcpServerCard());
+  return NextResponse.json(openapiDocument());
 }
