@@ -1,4 +1,5 @@
 import { ModelFilters, parseModelFilters } from '@/lib/filters';
+import type { ChangeEvent } from '@/lib/changes';
 
 export const API_CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -102,5 +103,51 @@ export function detailResponse(model: ApiModelRow | null | undefined, snapshots:
   return {
     ...serializeModel(model),
     snapshots: snapshots.map(serializeSnapshot),
+  };
+}
+
+export interface ApiProviderRow {
+  slug: string;
+  name: string;
+  modelCount: number | string | bigint;
+  minInputPricePerM: number | string | null;
+  maxInputPricePerM: number | string | null;
+}
+
+function toNumberOrNull(v: number | string | null): number | null {
+  if (v === null || v === undefined) return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+export function serializeProvider(p: ApiProviderRow) {
+  return {
+    slug: p.slug,
+    name: p.name,
+    modelCount: Number(p.modelCount),
+    minInputPricePerM: toNumberOrNull(p.minInputPricePerM),
+    maxInputPricePerM: toNumberOrNull(p.maxInputPricePerM),
+  };
+}
+
+export function providersResponse(rows: ApiProviderRow[]) {
+  return {
+    data: rows.map(serializeProvider),
+    total: rows.length,
+  };
+}
+
+export function serializeChangeEvent(ev: ChangeEvent) {
+  return {
+    ...ev,
+    timestamp: ev.timestamp instanceof Date ? ev.timestamp.toISOString() : ev.timestamp,
+  };
+}
+
+export function changesResponse(events: ChangeEvent[], days: number) {
+  return {
+    data: events.map(serializeChangeEvent),
+    total: events.length,
+    days,
   };
 }

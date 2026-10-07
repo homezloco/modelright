@@ -79,6 +79,8 @@ ${toolLines}
 ## REST fallback
   GET ${s.baseUrl}${s.restBase}/models[?provider=&modality=&status=&minContext=&maxInputPrice=&freeOnly=&sort=&limit=&offset=]
   GET ${s.baseUrl}${s.restBase}/models/{provider}/{slug}
+  GET ${s.baseUrl}${s.restBase}/providers
+  GET ${s.baseUrl}${s.restBase}/changes[?days=1-90]
   GET ${s.baseUrl}${s.searchEndpoint}?q={term}
   GET ${s.baseUrl}/openapi.json (also /.well-known/openapi.json)
 
@@ -139,6 +141,23 @@ export function openapiDocument() {
             '200': { description: 'Model detail' },
             '404': { description: 'Unknown provider/slug' },
           },
+        },
+      },
+      [`${s.restBase}/providers`]: {
+        get: {
+          operationId: 'listProviders',
+          summary: 'List providers with model counts and min/max input price per 1M tokens',
+          responses: { '200': { description: 'Provider list' } },
+        },
+      },
+      [`${s.restBase}/changes`]: {
+        get: {
+          operationId: 'listChanges',
+          summary: 'Catalog change events (new_model, removed_model, price_change) from the last 30 days',
+          parameters: [
+            { name: 'days', in: 'query', schema: { type: 'integer', default: 30, minimum: 1, maximum: 90 } },
+          ],
+          responses: { '200': { description: 'Change events, newest first' } },
         },
       },
       [s.searchEndpoint]: {
