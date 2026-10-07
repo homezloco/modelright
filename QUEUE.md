@@ -54,6 +54,9 @@ ticked in that item's own PR. Acceptance lines are the contract.
 - [x] q-0041 Admin dashboard — /admin gated by ADMIN_TOKEN env (?token= query param, timing-safe compare, notFound() when unset or mismatched — obscurity is fine, this is ops-only): registry totals (models by status, provider count), ingest run history (source, payload count, status, time from ingest_log), snapshot volume per day for the last 7 days, count of models carrying AA benchmarks, last-sync age with a stale warning >2h; all real DB reads, dark theme, no client JS — (ops) — acceptance: unit tests for the stats derivation functions and a route test that /admin 404s without the token and renders with it — branch modelright/q-0041-admin-dashboard
 
 
+- [ ] q-0042 Visitor & bot analytics (cityalert.live parity) — cookieless page-view tracking: page_views + bot_hits + mcp_calls drizzle tables (Postgres migration); POST /api/track beacon (zod-validated, rate-limited, daily-rotating sha256(ip+ua+date+SALT) visitor hash — raw IP never stored, no cookies); AnalyticsBeacon client component in root layout (sendBeacon, DNT honored, first-touch utm_* via sessionStorage); src/middleware.ts records AI-crawler hits by UA (GPTBot/ClaudeBot/PerplexityBot/Googlebot/etc.) via fire-and-forget internal POST to /api/bot-hit (middleware is edge runtime — no direct db); MCP tool calls counted into mcp_calls in the route's metered/safe wrapper; /admin gains an analytics section (same ?token= gate): views/day 30d, uniques, top paths, referrers, bot hits by crawler, MCP calls by tool — (ops, ux) — acceptance: unit tests for visitor-hash stability+rotation and UA bot classifier; route tests for /api/track validation and /admin analytics render — branch modelright/q-0042-analytics
+
+
 ## Done
 
 (Bootstrap skeleton pushed)
