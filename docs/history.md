@@ -2,6 +2,10 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:50 -->
+## 2026-10-07 — q-0039 Homepage movers
+[PR #50](https://github.com/homezloco/modelright/pull/50) · `modelright/q-0039-homepage-movers` · 5 files · +481/-26
+
 <!-- pr:49 -->
 ## 2026-10-07 — q-0038 REST completeness
 [PR #49](https://github.com/homezloco/modelright/pull/49) · `modelright/q-0038-v1-providers-changes` · 6 files · +373/-1 · $0.10
