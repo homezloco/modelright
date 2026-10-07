@@ -2,6 +2,10 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:49 -->
+## 2026-10-07 — q-0038 REST completeness
+[PR #49](https://github.com/homezloco/modelright/pull/49) · `modelright/q-0038-v1-providers-changes` · 6 files · +373/-1 · $0.10
+
 <!-- pr:48 -->
 ## 2026-10-07 — q-0037 Surface Artificial Analysis benchmarks
 [PR #48](https://github.com/homezloco/modelright/pull/48) · `modelright/q-0037-aa-benchmark-card` · 4 files · +247/-1
