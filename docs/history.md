@@ -2,6 +2,10 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:52 -->
+## 2026-10-07 — q-0042 Visitor & bot analytics (cityalert.live parity)
+[PR #52](https://github.com/homezloco/modelright/pull/52) · `modelright/q-0042-analytics` · 15 files · +2049/-5
+
 <!-- pr:51 -->
 ## 2026-10-07 — q-0041 Admin dashboard
 [PR #51](https://github.com/homezloco/modelright/pull/51) · `modelright/q-0041-admin-dashboard` · 3 files · +791/-0
