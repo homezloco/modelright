@@ -1,15 +1,9 @@
-export interface PageProps {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}
-
 export interface ModelItem {
   id: string;
   name: string;
   contextWindow: number;
   inputPricePerM: string;
   outputPricePerM: string;
-  numericInputPrice: number;
-  numericOutputPrice: number;
   modalityTags: string[];
   status: string;
   lastSeenAt: Date | null;
@@ -19,27 +13,23 @@ export interface ModelItem {
   slug: string;
 }
 
-export function parseModelParam(param?: string) {
-  if (!param) return null;
-  const parts = param.split('/');
-  if (parts.length !== 2) return null;
-  const [provider, slug] = parts;
-  if (!provider || !slug) return null;
-  return { provider: provider.toLowerCase(), slug: slug.toLowerCase() };
+export function parseModelKeys(mParam?: string): string[] {
+  if (!mParam) return [];
+  return mParam
+    .split(',')
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
 }
 
-export function processCompareParams(params: Record<string, string | string[] | undefined>) {
-  const a = Array.isArray(params.a) ? params.a[0] : params.a;
-  const b = Array.isArray(params.b) ? params.b[0] : params.b;
-  const m = Array.isArray(params.m) ? params.m[0] : params.m;
-
-  if (a || b) {
-    const list = [a, b].filter(Boolean).join(',');
-    return { redirectUrl: `/compare?m=${encodeURIComponent(list)}`, modelKeys: [], exceedsLimit: false };
-  }
-  const rawList = m ? m.split(',').map((s) => s.trim()).filter(Boolean) : [];
-  const exceedsLimit = rawList.length > 4;
-  const modelKeys = rawList.slice(0, 4);
-  return { redirectUrl: null, modelKeys, exceedsLimit };
+export function getCheapestIndices(values: (number | null)[]): number[] {
+  const validValues = values.filter((v): v is number => v !== null && !isNaN(v));
+  if (validValues.length === 0) return [];
+  const minVal = Math.min(...validValues);
+  const cheapest: number[] = [];
+  values.forEach((v, idx) => {
+    if (v !== null && Math.abs(v - minVal) < 1e-9) {
+      cheapest.push(idx);
+    }
+  });
+  return cheapest;
 }
-

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { parseModelKeys, getCheapestIndices } from '../src/app/compare/page';
+import { parseModelKeys, getCheapestIndices } from '../src/lib/compare';
 
 describe('q-0026 Compare up to 4 models logic', () => {
   test('parseModelKeys correctly parses comma-separated keys and handles casing/whitespace', () => {
