@@ -3,6 +3,7 @@ import { db } from '@/db/client';
 import { models, providers } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { buildVsPairs } from '@/lib/compare';
+import { TASK_RULES, TaskCategory } from '@/lib/picks';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,7 +35,40 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
+    {
+      url: `${baseUrl}/pick`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/changes`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/api`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/calculator`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    },
   ];
+
+  const taskRoutes: MetadataRoute.Sitemap = (Object.keys(TASK_RULES) as TaskCategory[]).map(
+    (task) => ({
+      url: `${baseUrl}/pick/${task}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    })
+  );
 
   let modelRoutes: MetadataRoute.Sitemap = [];
   let providerRoutes: MetadataRoute.Sitemap = [];
@@ -90,5 +124,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Failed to generate sitemap routes:', error);
   }
 
-  return [...staticRoutes, ...providerRoutes, ...modelRoutes, ...pairRoutes];
+  return [...staticRoutes, ...taskRoutes, ...providerRoutes, ...modelRoutes, ...pairRoutes];
 }
