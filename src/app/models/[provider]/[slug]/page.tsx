@@ -6,6 +6,7 @@ import { eq, and, desc } from 'drizzle-orm';
 import { PriceHistoryChart } from '@/components/PriceHistoryChart';
 import { getPriceChanges } from '@/lib/price-history';
 import { fetchModelRadar, findRadarScore } from '@/lib/model-radar';
+import { extractAABenchmarks } from '@/lib/aa-benchmarks';
 import { CostCalculator } from '@/components/CostCalculator';
 
 interface ModelDetailPageProps {
@@ -58,6 +59,7 @@ async function getModelData(providerSlug: string, modelSlug: string) {
     return {
       name: modelRec.name,
       providerName: providerRec.name,
+      aaBenchmarks: extractAABenchmarks(snapshotRows),
       contextWindow: modelRec.contextWindow,
       inputPricePerM: `$${Number(modelRec.inputPricePerM).toFixed(2)}`,
       outputPricePerM: `$${Number(modelRec.outputPricePerM).toFixed(2)}`,
@@ -187,6 +189,52 @@ export default async function ModelDetailPage({ params }: ModelDetailPageProps) 
             Benchmark data: Artificial Analysis · via{' '}
             <a href="https://livegraph.ai/model-radar" style={{ color: '#0066cc' }}>
               LiveGraph Model Radar
+            </a>
+          </p>
+        </section>
+      )}
+
+      {model.aaBenchmarks && (
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Benchmarks (Artificial Analysis)</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+            {model.aaBenchmarks.intelligenceIndex != null && (
+              <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
+                <div style={{ fontSize: '0.85rem', color: '#666' }}>Intelligence Index</div>
+                <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
+                  {model.aaBenchmarks.intelligenceIndex.toFixed(1)}
+                </div>
+              </div>
+            )}
+            {model.aaBenchmarks.codingIndex != null && (
+              <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
+                <div style={{ fontSize: '0.85rem', color: '#666' }}>Coding Index</div>
+                <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
+                  {model.aaBenchmarks.codingIndex.toFixed(1)}
+                </div>
+              </div>
+            )}
+            {model.aaBenchmarks.outputTokensPerSecond != null && (
+              <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
+                <div style={{ fontSize: '0.85rem', color: '#666' }}>Output Speed</div>
+                <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
+                  {model.aaBenchmarks.outputTokensPerSecond.toFixed(1)} tok/s
+                </div>
+              </div>
+            )}
+            {model.aaBenchmarks.ttftSeconds != null && (
+              <div style={{ padding: '1rem', background: '#f9f9f9', borderRadius: '6px', color: '#111827' }}>
+                <div style={{ fontSize: '0.85rem', color: '#666' }}>Time to First Token</div>
+                <div style={{ fontSize: '1.25rem', fontWeight: '600', marginTop: '0.25rem' }}>
+                  {model.aaBenchmarks.ttftSeconds.toFixed(2)} s
+                </div>
+              </div>
+            )}
+          </div>
+          <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.75rem' }}>
+            Benchmark data:{' '}
+            <a href="https://artificialanalysis.ai" style={{ color: '#0066cc' }}>
+              Artificial Analysis
             </a>
           </p>
         </section>
