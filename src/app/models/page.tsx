@@ -1,27 +1,25 @@
 import { db } from '@/db/client';
 import { models, providers } from '@/db/schema';
-import { eq, asc, desc, sql, SQL, count } from 'drizzle-orm';
+import { asc, desc, count } from 'drizzle-orm';
 import Link from 'next/link';
+import { parseModelFilters, buildModelWhereClause } from '@/lib/filters';
 
 export const dynamic = 'force-dynamic';
 
 const PAGE_SIZE = 50;
 
-interface SearchParams {
-  provider?: string;
-  sort?: string;
-  page?: string;
+interface PageProps {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }> | { [key: string]: string | string[] | undefined };
 }
 
-export default async function ModelsPage({
-  searchParams,
-}: {
-  searchParams?: SearchParams;
-}) {
-  const providerFilter = searchParams?.provider?.trim().toLowerCase() || '';
-  const sortParam = searchParams?.sort || '';
-  const rawPage = parseInt(searchParams?.page || '1', 10);
+export default async function ModelsPage({ searchParams }: PageProps) {
+  const resolvedParams = searchParams ? await Promise.resolve(searchParams) : {};
+  
+  const sortParam = (typeof resolvedParams.sort === 'string' ? resolvedParams.sort : '') || '';
+  const rawPage = parseInt((typeof resolvedParams.page === 'string' ? resolvedParams.page : '1') || '1', 10);
   const currentPage = isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
+
+  const filters = parseModelFilters(resolvedParams);
 
   let modelRows: Array<{
     id: string;
@@ -48,13 +46,7 @@ export default async function ModelsPage({
       .from(providers)
       .orderBy(asc(providers.name));
 
-    // Build WHERE clause
-    const whereConditions: SQL[] = [];
-    if (providerFilter) {
-      whereConditions.push(eq(sql`LOWER(${providers.slug})`, providerFilter));
-    }
-    const whereClause =
-      whereConditions.length > 0 ? whereConditions[0] : undefined;
+    const whereClause = buildModelWhereClause(filters);
 
     // Count total matching rows
     const countResult = await db
@@ -78,7 +70,6 @@ export default async function ModelsPage({
     } else if (sortParam === 'name') {
       orderByClause = [asc(models.name)];
     } else {
-      // default sort by provider then name
       orderByClause = [asc(providers.name), asc(models.name)];
     }
 
@@ -110,25 +101,49 @@ export default async function ModelsPage({
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
-  const createQueryString = (params: {
-    provider?: string;
-    sort?: string;
-    page?: number;
-  }) => {
+  const createQueryString = (overrides: Record<string, string | number | undefined>) => {
     const newParams = new URLSearchParams();
 
-    const newProvider =
-      params.provider !== undefined ? params.provider : providerFilter;
-    const newSort = params.sort !== undefined ? params.sort : sortParam;
-    const newPage = params.page !== undefined ? params.page : currentPage;
+    // Preserve all active filter/sort/page params unless overridden
+    const curProvider = filters.provider;
+    const curSort = sortParam;
+    const curMinCtx = filters.minContext;
+    const curMaxPrice = filters.maxInputPrice;
+    const curModality = filters.modality;
+    const curFreeOnly = filters.freeOnly;
+    const curHideRemoved = filters.hideRemoved;
 
-    if (newProvider) newParams.set('provider', newProvider);
-    if (newSort) newParams.set('sort', newSort);
-    if (newPage > 1) newParams.set('page', newPage.toString());
+    const finalProvider = 'provider' in overrides ? overrides.provider : curProvider;
+    const finalSort = 'sort' in overrides ? overrides.sort : curSort;
+    const finalPage = 'page' in overrides ? overrides.page : currentPage;
+    const finalMinCtx = 'minContext' in overrides ? overrides.minContext : curMinCtx;
+    const finalMaxPrice = 'maxInputPrice' in overrides ? overrides.maxInputPrice : curMaxPrice;
+    const finalModality = 'modality' in overrides ? overrides.modality : curModality;
+    const finalFreeOnly = 'freeOnly' in overrides ? overrides.freeOnly : curFreeOnly;
+    const finalHideRemoved = 'hideRemoved' in overrides ? overrides.hideRemoved : curHideRemoved;
+
+    if (finalProvider) newParams.set('provider', String(finalProvider));
+    if (finalSort) newParams.set('sort', String(finalSort));
+    if (finalMinCtx) newParams.set('minContext', String(finalMinCtx));
+    if (finalMaxPrice !== undefined) newParams.set('maxInputPrice', String(finalMaxPrice));
+    if (finalModality) newParams.set('modality', String(finalModality));
+    if (finalFreeOnly) newParams.set('freeOnly', 'true');
+    if (finalHideRemoved === false) newParams.set('hideRemoved', 'false');
+    if (Number(finalPage) > 1) newParams.set('page', String(finalPage));
 
     const qs = newParams.toString();
     return qs ? `/models?${qs}` : '/models';
   };
+
+  const isFiltered = Boolean(
+    filters.provider ||
+    filters.minContext ||
+    filters.maxInputPrice !== undefined ||
+    filters.modality ||
+    filters.freeOnly ||
+    filters.hideRemoved === false ||
+    sortParam
+  );
 
   return (
     <main style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
@@ -136,16 +151,16 @@ export default async function ModelsPage({
         <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', margin: 0 }}>Models</h1>
 
         {/* Filters and Controls */}
-        <form method="GET" action="/models" style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <form method="GET" action="/models" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <div>
-            <label htmlFor="provider-select" style={{ marginRight: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
+            <label htmlFor="provider-select" style={{ marginRight: '0.25rem', fontSize: '0.875rem', fontWeight: 500 }}>
               Provider:
             </label>
             <select
               id="provider-select"
               name="provider"
-              defaultValue={providerFilter}
-              style={{ padding: '0.375rem 0.75rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', backgroundColor: '#fff', fontSize: '0.875rem' }}
+              defaultValue={filters.provider || ''}
+              style={{ padding: '0.375rem 0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', backgroundColor: '#fff', fontSize: '0.875rem' }}
             >
               <option value="">All Providers</option>
               {providerList.map((p) => (
@@ -157,14 +172,60 @@ export default async function ModelsPage({
           </div>
 
           <div>
-            <label htmlFor="sort-select" style={{ marginRight: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
-              Sort by:
+            <label htmlFor="min-context" style={{ marginRight: '0.25rem', fontSize: '0.875rem', fontWeight: 500 }}>
+              Min Context:
+            </label>
+            <input
+              type="number"
+              id="min-context"
+              name="minContext"
+              placeholder="e.g. 32000"
+              defaultValue={filters.minContext || ''}
+              style={{ width: '100px', padding: '0.375rem 0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', fontSize: '0.875rem' }}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="max-price" style={{ marginRight: '0.25rem', fontSize: '0.875rem', fontWeight: 500 }}>
+              Max $/1M In:
+            </label>
+            <input
+              type="number"
+              step="any"
+              id="max-price"
+              name="maxInputPrice"
+              placeholder="e.g. 2.50"
+              defaultValue={filters.maxInputPrice !== undefined ? filters.maxInputPrice : ''}
+              style={{ width: '90px', padding: '0.375rem 0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', fontSize: '0.875rem' }}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="modality-select" style={{ marginRight: '0.25rem', fontSize: '0.875rem', fontWeight: 500 }}>
+              Modality:
+            </label>
+            <select
+              id="modality-select"
+              name="modality"
+              defaultValue={filters.modality || ''}
+              style={{ padding: '0.375rem 0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', backgroundColor: '#fff', fontSize: '0.875rem' }}
+            >
+              <option value="">All Modalities</option>
+              <option value="vision">Vision</option>
+              <option value="audio">Audio</option>
+              <option value="image">Image Output</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="sort-select" style={{ marginRight: '0.25rem', fontSize: '0.875rem', fontWeight: 500 }}>
+              Sort:
             </label>
             <select
               id="sort-select"
               name="sort"
               defaultValue={sortParam}
-              style={{ padding: '0.375rem 0.75rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', backgroundColor: '#fff', fontSize: '0.875rem' }}
+              style={{ padding: '0.375rem 0.5rem', borderRadius: '0.375rem', border: '1px solid #d1d5db', backgroundColor: '#fff', fontSize: '0.875rem' }}
             >
               <option value="">Default (Provider)</option>
               <option value="price_in">Price $/1M Input (Low to High)</option>
@@ -174,6 +235,26 @@ export default async function ModelsPage({
               <option value="name">Name</option>
             </select>
           </div>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.875rem', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              name="freeOnly"
+              value="true"
+              defaultChecked={filters.freeOnly}
+            />
+            Free only
+          </label>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.875rem', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              name="hideRemoved"
+              value="true"
+              defaultChecked={filters.hideRemoved}
+            />
+            Hide removed
+          </label>
 
           <button
             type="submit"
@@ -191,7 +272,7 @@ export default async function ModelsPage({
             Apply
           </button>
 
-          {(providerFilter || sortParam) && (
+          {isFiltered && (
             <Link
               href="/models"
               style={{
@@ -207,9 +288,15 @@ export default async function ModelsPage({
       </div>
 
       {modelRows.length === 0 ? (
-        <p style={{ color: '#666', fontStyle: 'italic', padding: '2rem 0' }}>
-          No models available.
-        </p>
+        <div style={{ color: '#6b7280', padding: '2rem 0', textAlign: 'center' }}>
+          <p style={{ fontSize: '1.125rem', marginBottom: '0.5rem' }}>No models match — widen a filter</p>
+          <Link
+            href="/models"
+            style={{ color: '#3b82f6', textDecoration: 'underline', fontSize: '0.875rem' }}
+          >
+            Reset all filters
+          </Link>
+        </div>
       ) : (
         <>
           <div style={{ overflowX: 'auto' }}>
