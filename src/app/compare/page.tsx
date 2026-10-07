@@ -96,7 +96,8 @@ export default async function ComparePage(props: PageProps) {
   }
 
   const selectedModels: ModelItem[] = [];
-  for (const keyStr of paramCheck.modelKeys) {
+  const rawModelKeys = paramCheck.redirectUrl ? [] : paramCheck.modelKeys;
+  for (const keyStr of rawModelKeys) {
     const parsed = parseModelParam(keyStr);
     if (parsed) {
       const match = allModels.find(
@@ -110,9 +111,10 @@ export default async function ComparePage(props: PageProps) {
     }
   }
 
-  const inTokens = Math.max(0, Number(searchParams.in) || 1000);
-  const outTokens = Math.max(0, Number(searchParams.out) || 500);
-  const rpd = Math.max(0, Number(searchParams.rpd) || 1000);
+  const resolvedParams = await props.searchParams;
+  const inTokens = Math.max(0, Number(resolvedParams.in) || 1000);
+  const outTokens = Math.max(0, Number(resolvedParams.out) || 500);
+  const rpd = Math.max(0, Number(resolvedParams.rpd) || 1000);
   const callsPerMonth = rpd * 30;
 
   const showComparison = selectedModels.length >= 2;
