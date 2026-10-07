@@ -51,6 +51,9 @@ ticked in that item's own PR. Acceptance lines are the contract.
 - [x] q-0039 Homepage movers — / gains a "This week" section computed from lib/changes (no new queries): up to 5 biggest price drops (with % and link to detail) and up to 5 newest models (with provider + age); hidden gracefully when the registry has <7 days of history — (ux) — acceptance: unit test that the movers derivation picks biggest drops and newest correctly from a fixture event list — branch modelright/q-0039-homepage-movers
 - [x] q-0040 Discovery completeness — sitemap gains /pick, /pick/[task] for each task, /changes, /api, /calculator; llms.txt updated to mention /api/v1 REST, /api/mcp tools, /pick task lists, and /compare/<a>-vs-<b> pages (it predates them); robots.txt already exists — verify it doesn't disallow the new surfaces — acceptance: sitemap test asserts the new static + task routes are present; llms.txt test asserts the new endpoints are listed — branch modelright/q-0040-discovery-completeness
 
+- [ ] q-0041 Admin dashboard — /admin gated by ADMIN_TOKEN env (?token= query param, timing-safe compare, notFound() when unset or mismatched — obscurity is fine, this is ops-only): registry totals (models by status, provider count), ingest run history (source, payload count, status, time from ingest_log), snapshot volume per day for the last 7 days, count of models carrying AA benchmarks, last-sync age with a stale warning >2h; all real DB reads, dark theme, no client JS — (ops) — acceptance: unit tests for the stats derivation functions and a route test that /admin 404s without the token and renders with it — branch modelright/q-0041-admin-dashboard
+
+
 ## Done
 
 (Bootstrap skeleton pushed)
