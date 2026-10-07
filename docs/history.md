@@ -2,6 +2,10 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:47 -->
+## 2026-10-07 — q-0040 Discovery completeness
+[PR #47](https://github.com/homezloco/modelright/pull/47) · `modelright/q-0040-discovery-completeness` · 4 files · +179/-8
+
 <!-- pr:46 -->
 ## 2026-10-07 — q-0028 Task picks
 [PR #46](https://github.com/homezloco/modelright/pull/46) · `modelright/q-0028-task-picks` · 7 files · +728/-0 · $0.88
