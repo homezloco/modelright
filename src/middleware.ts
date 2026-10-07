@@ -18,12 +18,14 @@ export function middleware(req: NextRequest, event: NextFetchEvent) {
           path: req.nextUrl.pathname.slice(0, 300),
           ua: ua.slice(0, 500),
         }),
-      }).catch(() => {
-        /* analytics must never break a request */
       })
+        .then((r) => console.log(`[mw] bot-hit ${r.status} ${req.nextUrl.pathname}`))
+        .catch((e) => console.log(`[mw] bot-hit FAIL ${req.nextUrl.pathname} ${String(e)}`))
     );
   }
-  return NextResponse.next();
+  const res = NextResponse.next();
+  res.headers.set('x-mr-mw', '1');
+  return res;
 }
 
 export const config = {
