@@ -2,6 +2,12 @@
 
 One card per merged loop pull request, newest first. A card is written when that pull request merges. The linked agent's note is that round's own report.
 
+<!-- pr:39 -->
+## 2026-10-07 — q-0027 Find-a-model filters
+[PR #39](https://github.com/homezloco/modelright/pull/39) · `modelright/q-0027-find-a-model-filters` · 4 files · +336/-44 · $0.24
+
+Agent's note: [docs/loop-reports/2026-10-07-q-0027-find-a-model-filters.md](docs/loop-reports/2026-10-07-q-0027-find-a-model-filters.md)
+
 <!-- pr:38 -->
 ## 2026-10-07 — q-0026 Compare up to 4 models
 [PR #38](https://github.com/homezloco/modelright/pull/38) · `modelright/q-0026-compare-four` · 5 files · +298/-162 · $0.65
