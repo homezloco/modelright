@@ -2,9 +2,10 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { db } from '@/db/client';
-import { models, providers } from '@/db/schema';
-import { eq, ne } from 'drizzle-orm';
+import { models, providers, modelSnapshots } from '@/db/schema';
+import { eq, ne, desc, sql } from 'drizzle-orm';
 import { TASK_RULES, TaskCategory, TaskPickModel } from '@/lib/picks';
+import { extractAABenchmarksByModel } from '@/lib/aa-benchmarks';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,6 +66,24 @@ export default async function TaskPickPage(props: PageProps) {
       modalityTags: (r.modalityTags as string[]) ?? [],
       status: r.status ?? 'active',
     }));
+
+    // Coding picks prefer AA coding-index data when a model carries it:
+    // attach each model's newest benchmarked-snapshot coding index.
+    if (taskKey === 'coding' && dbModels.length > 0) {
+      const snapRows = await db
+        .select({
+          modelId: modelSnapshots.modelId,
+          rawPayload: modelSnapshots.rawPayload,
+        })
+        .from(modelSnapshots)
+        .where(sql`(${modelSnapshots.rawPayload}::jsonb) ? 'benchmarks'`)
+        .orderBy(desc(modelSnapshots.capturedAt));
+
+      const benchmarksByModel = extractAABenchmarksByModel(snapRows);
+      for (const m of dbModels) {
+        m.codingIndex = benchmarksByModel.get(m.id)?.codingIndex ?? null;
+      }
+    }
   } catch (err) {
     console.error('Failed to fetch models for task picks:', err);
   }

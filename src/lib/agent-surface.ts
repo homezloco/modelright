@@ -61,6 +61,25 @@ export const MCP_TOOLS = [
   },
 ] as const;
 
+/**
+ * Human-facing route list rendered as llms.txt's "Main Routes" section —
+ * the single source of truth for that list. `taskCategories` is the joined
+ * TASK_RULES key list from the route file.
+ */
+export function mainRouteLines(taskCategories: string): string[] {
+  return [
+    '/models : Full list of AI models with pricing and context windows',
+    '/providers : Provider index; /providers/{slug} for per-provider model lists',
+    '/pick : Curated top-10 task picks index',
+    `/pick/{task} : Top-10 model picks per task; task is one of: ${taskCategories}`,
+    '/rankings : Leaderboards ranked by Artificial Analysis benchmarks (intelligence index, coding index, output tok/s, TTFT) joined to live $/1M pricing',
+    '/compare : Side-by-side spec and price comparison tool\n  - /compare?m={provider/slug},{provider/slug},... : ad-hoc comparison of 2+ models\n  - /compare/{a}-vs-{b} : canonical pair pages, e.g. /compare/openai--gpt-4o-vs-anthropic--claude-sonnet',
+    '/changes : Recent catalog changes',
+    '/calculator : Cost calculator — tokens in/out and requests/day to estimated spend',
+    '/api : API documentation with examples',
+  ];
+}
+
 export function agentsTxt(): string {
   const s = AGENT_SURFACE;
   const toolLines = MCP_TOOLS.map((t) => `  - ${t.name}: ${t.description}`).join('\n');

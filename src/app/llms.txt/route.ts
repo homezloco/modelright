@@ -1,4 +1,4 @@
-import { AGENT_SURFACE, MCP_TOOLS } from '@/lib/agent-surface';
+import { AGENT_SURFACE, MCP_TOOLS, mainRouteLines } from '@/lib/agent-surface';
 import { TASK_RULES, TaskCategory } from '@/lib/picks';
 
 export const dynamic = 'force-static';
@@ -6,22 +6,14 @@ export const dynamic = 'force-static';
 export function GET() {
   const tasks = (Object.keys(TASK_RULES) as TaskCategory[]).join(', ');
   const toolLines = MCP_TOOLS.map((t) => `  - ${t.name}: ${t.description}`).join('\n');
+  const routeLines = mainRouteLines(tasks).map((r) => `- ${r}`).join('\n');
 
   const content = `# modelright
 
 > Modelright tracks AI model specifications, pricing, availability, and snapshots across providers.
 
 ## Main Routes
-- /models : Full list of AI models with pricing and context windows
-- /providers : Provider index; /providers/{slug} for per-provider model lists
-- /pick : Curated top-10 task picks index
-- /pick/{task} : Top-10 model picks per task; task is one of: ${tasks}
-- /compare : Side-by-side spec and price comparison tool
-  - /compare?m={provider/slug},{provider/slug},... : ad-hoc comparison of 2+ models
-  - /compare/{a}-vs-{b} : canonical pair pages, e.g. /compare/openai--gpt-4o-vs-anthropic--claude-sonnet
-- /changes : Recent catalog changes
-- /calculator : Cost calculator — tokens in/out and requests/day to estimated spend
-- /api : API documentation with examples
+${routeLines}
 
 ## REST API
 - GET /api/v1/models : JSON list of all models (filters: provider, modality, status, minContext, maxInputPrice, freeOnly, sort, limit, offset)

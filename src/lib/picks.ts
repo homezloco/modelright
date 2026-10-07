@@ -9,6 +9,9 @@ export interface TaskPickModel {
   outputPricePerM: string;
   modalityTags: string[];
   status: string;
+  /** Artificial Analysis coding index from the model's newest benchmarked
+   *  snapshot; null/absent when the model carries no AA coding data. */
+  codingIndex?: number | null;
 }
 
 export type TaskCategory = 'chat' | 'coding' | 'long-context' | 'vision' | 'cheap-bulk';
@@ -91,21 +94,27 @@ export const TASK_RULES: Record<TaskCategory, TaskRule> = {
   'coding': {
     key: 'coding',
     title: 'Coding Task Picks',
-    description: 'Capable models from premier providers suited for code generation, refactoring, and debugging.',
-    ruleText: 'Available paid models from the five most-listed active providers, excluding removed models, sorted by output price ascending.',
-    filterAndSort: (models: TaskPickModel[]) => filterChatAndCoding(models),
+    description: 'Capable models suited for code generation, refactoring, and debugging — benchmarked models first.',
+    ruleText: 'Available paid models carrying an Artificial Analysis coding index rank first, highest index wins; remaining slots fall back to the five most-listed active providers, sorted by output price ascending. Removed models excluded.',
+    filterAndSort: (models: TaskPickModel[]) => filterCoding(models),
   },
 };
 
-function filterChatAndCoding(models: TaskPickModel[]): TaskPickModel[] {
-  // Filter active/available paid models
-  const eligible = models.filter((m) => {
+// Filter active/available paid models
+function eligiblePaidModels(models: TaskPickModel[]): TaskPickModel[] {
+  return models.filter((m) => {
     if (m.status === 'removed') return false;
     const inP = parseFloat(m.inputPricePerM) || 0;
     const outP = parseFloat(m.outputPricePerM) || 0;
     // Paid models (non-zero price)
     return inP > 0 || outP > 0;
   });
+}
+
+// Existing rule ordering, unsliced: paid models from the five most-listed
+// active providers, sorted by output price ascending.
+function providerCountOrdering(models: TaskPickModel[]): TaskPickModel[] {
+  const eligible = eligiblePaidModels(models);
 
   // Count models per provider among eligible
   const providerCounts: Record<string, number> = {};
@@ -128,6 +137,29 @@ function filterChatAndCoding(models: TaskPickModel[]): TaskPickModel[] {
       const priceB = parseFloat(b.outputPricePerM) || 0;
       if (priceA !== priceB) return priceA - priceB;
       return a.name.localeCompare(b.name);
-    })
-    .slice(0, 10);
+    });
+}
+
+function filterChatAndCoding(models: TaskPickModel[]): TaskPickModel[] {
+  return providerCountOrdering(models).slice(0, 10);
+}
+
+/**
+ * Coding picks prefer real benchmark data: eligible models carrying an AA
+ * coding index rank first (index descending); models without one keep the
+ * existing provider-count rule ordering and follow after the ranked set.
+ */
+function filterCoding(models: TaskPickModel[]): TaskPickModel[] {
+  const benchmarked = eligiblePaidModels(models)
+    .filter((m) => typeof m.codingIndex === 'number' && Number.isFinite(m.codingIndex))
+    .sort(
+      (a, b) =>
+        (b.codingIndex as number) - (a.codingIndex as number) ||
+        a.name.localeCompare(b.name)
+    );
+
+  const rankedIds = new Set(benchmarked.map((m) => m.id));
+  const rest = providerCountOrdering(models).filter((m) => !rankedIds.has(m.id));
+
+  return [...benchmarked, ...rest].slice(0, 10);
 }
