@@ -18,7 +18,8 @@ interface PageProps {
   }>;
 }
 
-import { ModelItem, parseModelKeys, getCheapestIndices } from '@/lib/compare';
+import { ModelItem, parseModelKeys, getCheapestIndices, CURATED_PRESETS, resolvePresetKeys, modelKey } from '@/lib/compare';
+import ComparePicker from '@/components/ComparePicker';
 
 export default async function ComparePage(props: PageProps) {
   const searchParams = await props.searchParams;
@@ -101,6 +102,16 @@ export default async function ComparePage(props: PageProps) {
   const monthCosts = calculatedCosts.map((c) => c.totalCostPerMonth);
   const cheapestMonthIndices = getCheapestIndices(monthCosts);
 
+  const pickerModels = allModels.map((m) => ({
+    key: modelKey(m),
+    name: m.name,
+    providerName: m.providerName,
+    status: m.status,
+  }));
+  const presets = CURATED_PRESETS.map((p) => ({ preset: p, keys: resolvePresetKeys(p, allModels) })).filter(
+    (p): p is { preset: (typeof CURATED_PRESETS)[number]; keys: string[] } => p.keys !== null
+  );
+
   return (
     <main style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif', maxWidth: '1100px', margin: '0 auto' }}>
       <h1>Compare Models</h1>
@@ -124,7 +135,7 @@ export default async function ComparePage(props: PageProps) {
         </div>
       )}
 
-      {selectedModels.length > 0 ? (
+      {selectedModels.length > 0 && (
         <div>
           <div style={{ marginBottom: '1.5rem' }}>
             <Link href="/compare" style={{ color: '#38bdf8', textDecoration: 'none' }}>
@@ -238,18 +249,31 @@ export default async function ComparePage(props: PageProps) {
             </tbody>
           </table>
         </div>
-      ) : (
-        <div style={{ background: '#1e293b', border: '1px solid #334155', padding: '2rem', borderRadius: '8px' }}>
-          <h2>Select Models to Compare</h2>
-          <p style={{ color: '#94a3b8' }}>
-            Choose up to 4 models to see a side-by-side comparison of pricing, context window, and estimated usage cost.
-          </p>
-          {allModels.length > 0 && (
-            <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              {allModels.slice(0, 10).map((m) => (
+      )}
+
+      <div
+        style={{
+          background: '#1e293b',
+          border: '1px solid #334155',
+          padding: '2rem',
+          borderRadius: '8px',
+          marginTop: selectedModels.length > 0 ? '2rem' : 0,
+        }}
+      >
+        <h2>{selectedModels.length > 0 ? 'Change Selection' : 'Select Models to Compare'}</h2>
+        <p style={{ color: '#94a3b8' }}>
+          Choose up to 4 models to see a side-by-side comparison of pricing, context window, and estimated usage cost.
+        </p>
+
+        {presets.length > 0 && (
+          <div style={{ marginTop: '1rem', marginBottom: '1.5rem' }}>
+            <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.5rem' }}>Curated comparisons</div>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {presets.map(({ preset, keys }) => (
                 <Link
-                  key={m.id}
-                  href={`/compare?m=${m.providerSlug}/${m.slug}`}
+                  key={preset.name}
+                  href={`/compare?m=${encodeURIComponent(keys.join(','))}`}
+                  title={preset.blurb}
                   style={{
                     padding: '0.5rem 1rem',
                     background: '#0f172a',
@@ -260,13 +284,19 @@ export default async function ComparePage(props: PageProps) {
                     fontSize: '0.875rem',
                   }}
                 >
-                  + {m.name} ({m.providerName})
+                  {preset.name}: {preset.blurb}
                 </Link>
               ))}
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+
+        {pickerModels.length > 0 ? (
+          <ComparePicker models={pickerModels} initialSelected={selectedModels.map(modelKey)} />
+        ) : (
+          <p style={{ color: '#94a3b8' }}>No models in the registry yet — check back after the next sync.</p>
+        )}
+      </div>
     </main>
   );
 }
