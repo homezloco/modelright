@@ -88,6 +88,18 @@ export default function ApiDocsPage() {
         <li>
           <code>/llms.txt</code> — llms.txt manifest
         </li>
+        <li>
+          <code>/agents.txt</code> — preferred agent interface, tools, auth, and rate limits
+        </li>
+        <li>
+          <code>/openapi.json</code> (also <code>/.well-known/openapi.json</code>) — OpenAPI 3.1 spec
+        </li>
+        <li>
+          <code>/.well-known/agent-card.json</code> — A2A agent card (<code>/.well-known/agent.json</code> redirects here)
+        </li>
+        <li>
+          <code>/.well-known/mcp</code> — MCP alias; <code>/.well-known/mcp/server-card.json</code> — Smithery server card
+        </li>
       </ul>
     </main>
   );

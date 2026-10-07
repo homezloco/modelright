@@ -81,6 +81,12 @@ export default async function RootLayout({
               <Link href="/changes" style={{ color: '#64748b', textDecoration: 'none' }}>
                 Changes
               </Link>
+              <Link href="/api" style={{ color: '#64748b', textDecoration: 'none' }}>
+                API
+              </Link>
+              <a href="/agents.txt" style={{ color: '#64748b', textDecoration: 'none' }}>
+                agents.txt
+              </a>
               <a href="https://livegraph.ai" target="_blank" rel="noopener noreferrer" style={{ color: '#64748b', textDecoration: 'none' }}>
                 Built with LiveGraph
               </a>
