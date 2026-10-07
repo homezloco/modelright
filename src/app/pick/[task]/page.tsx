@@ -9,12 +9,13 @@ import { TASK_RULES, TaskCategory, TaskPickModel } from '@/lib/picks';
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     task: string;
-  };
+  }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const params = await props.params;
   const taskKey = params.task as TaskCategory;
   const rule = TASK_RULES[taskKey];
   if (!rule) return { title: 'Task Not Found | Modelright' };
@@ -24,8 +25,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function TaskPickPage({ params }: PageProps) {
-  const taskKey = params.task as TaskCategory;
+export default async function TaskPickPage(props: PageProps) {
+  const params = await props.params;
   const rule = TASK_RULES[taskKey];
 
   if (!rule) {
