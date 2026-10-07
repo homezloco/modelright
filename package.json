@@ -1,7 +1,23 @@
 {
   "name": "modelright",
   "version": "0.1.0",
-  "private": true,
+  "description": "Live registry of AI model specs, context windows, and per-1M-token pricing — with compare, task picks, a public JSON API, and an MCP server.",
+  "license": "MIT",
+  "homepage": "https://modelright.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/homezloco/modelright"
+  },
+  "keywords": [
+    "ai-models",
+    "llm",
+    "model-registry",
+    "pricing",
+    "openrouter",
+    "mcp",
+    "nextjs",
+    "drizzle"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
