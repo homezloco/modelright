@@ -27,6 +27,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 
 export default async function TaskPickPage(props: PageProps) {
   const params = await props.params;
+  const taskKey = params.task as TaskCategory;
   const rule = TASK_RULES[taskKey];
 
   if (!rule) {
