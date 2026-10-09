@@ -1,0 +1,63 @@
+/* Mobile-first responsive styles */
+
+@media (max-width: 639px) {
+  .card-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .card-stack-item {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: #fff;
+  }
+
+  .card-stack-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-stack-label {
+    font-weight: bold;
+    margin-right: 0.5rem;
+  }
+
+  .card-stack-value {
+    text-align: right;
+  }
+
+  /* Hide regular table on mobile */
+  .responsive-table {
+    display: none;
+  }
+
+  /* Show card stack on mobile */
+  .responsive-card-stack {
+    display: block;
+  }
+}
+
+@media (min-width: 640px) {
+  /* Show regular table on larger screens */
+  .responsive-table {
+    display: table;
+  }
+
+  /* Hide card stack on larger screens */
+  .responsive-card-stack {
+    display: none;
+  }
+}
+
+/* Ensure links are tappable */
+.card-stack a,
+.responsive-table a {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
