@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import CardStack from '@/components/CardStack';
+import '@/styles/responsive.css';
 import { Metadata } from 'next';
 import { db } from '@/db/client';
 import { models, providers, modelSnapshots } from '@/db/schema';
@@ -169,6 +171,28 @@ function LeaderboardTable({
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile card stack view */}
+        <div className="responsive-card-stack">
+          <CardStack 
+            data={rows.map(row => ({
+              rank: `#${row.rank}`,
+              modelName: row.modelName,
+              providerName: row.providerName,
+              score: dim.format(row.score),
+              inputPrice: row.inputPricePerM === null ? '—' : `${row.inputPricePerM.toFixed(2)}`,
+              outputPrice: row.outputPricePerM === null ? '—' : `${row.outputPricePerM.toFixed(2)}`
+            }))}
+            labels={{
+              rank: 'Rank',
+              modelName: 'Model',
+              providerName: 'Provider',
+              score: 'Score',
+              inputPrice: '$/1M In',
+              outputPrice: '$/1M Out'
+            }}
+          />
         </div>
       )}
     </section>
