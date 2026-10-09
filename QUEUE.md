@@ -58,6 +58,10 @@ ticked in that item's own PR. Acceptance lines are the contract.
 - [x] q-0042 Visitor & bot analytics (cityalert.live parity) — cookieless page-view tracking: page_views + bot_hits + mcp_calls drizzle tables (Postgres migration); POST /api/track beacon (zod-validated, rate-limited, daily-rotating sha256(ip+ua+date+SALT) visitor hash — raw IP never stored, no cookies); AnalyticsBeacon client component in root layout (sendBeacon, DNT honored, first-touch utm_* via sessionStorage); src/middleware.ts records AI-crawler hits by UA (GPTBot/ClaudeBot/PerplexityBot/Googlebot/etc.) via fire-and-forget internal POST to /api/bot-hit (middleware is edge runtime — no direct db); MCP tool calls counted into mcp_calls in the route's metered/safe wrapper; /admin gains an analytics section (same ?token= gate): views/day 30d, uniques, top paths, referrers, bot hits by crawler, MCP calls by tool — (ops, ux) — acceptance: unit tests for visitor-hash stability+rotation and UA bot classifier; route tests for /api/track validation and /admin analytics render — branch modelright/q-0042-analytics
 
 
+- [ ] q-0044 Add search functionality for model list — /models filter/search: implement a text-based search input to query models by slug, provider name, or description; update the URL query parameter for shareable searches; add a clear search button — (ux) — acceptance: search input filters the models list dynamically; browser history updates correctly; search cleared by button or manual removal.
+- [ ] q-0045 Implement price history visualization — /models/[provider]/[slug]: add a simple SVG or lightweight chart component to visualize price evolution over time using data from model_snapshots; include a toggle for log/linear scale — (ux) — acceptance: chart renders on model details page; toggles correctly adjust scale; hover effects show price/date at specific points.
+
 ## Done
+
 
 (Bootstrap skeleton pushed)
