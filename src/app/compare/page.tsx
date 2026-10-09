@@ -20,6 +20,8 @@ interface PageProps {
 
 import { ModelItem, parseModelKeys, CURATED_PRESETS, resolvePresetKeys, modelKey } from '@/lib/compare';
 import ComparePicker from '@/components/ComparePicker';
+import CardStack from '@/components/CardStack';
+import '@/styles/responsive.css';
 
 export default async function ComparePage(props: PageProps) {
   const searchParams = await props.searchParams;
@@ -132,6 +134,28 @@ export default async function ComparePage(props: PageProps) {
             outputTokens={outputTokens}
             rpd={rpd}
           />
+
+          {/* Mobile card stack view */}
+          <div className="responsive-card-stack">
+            <CardStack 
+              data={selectedModels.map(model => ({
+                name: model.name,
+                provider: model.providerName,
+                contextWindow: model.contextWindow?.toLocaleString() || 'N/A',
+                inputPrice: model.inputPricePerM ? `${model.inputPricePerM}` : 'N/A',
+                outputPrice: model.outputPricePerM ? `${model.outputPricePerM}` : 'N/A',
+                modalities: model.modalityTags?.join(', ') || 'text'
+              }))}
+              labels={{
+                name: 'Model',
+                provider: 'Provider',
+                contextWindow: 'Context Window',
+                inputPrice: 'Input Price (/1M)',
+                outputPrice: 'Output Price (/1M)',
+                modalities: 'Modalities'
+              }}
+            />
+          </div>
         </div>
       )}
 
