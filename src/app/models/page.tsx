@@ -2,6 +2,8 @@ import { db } from '@/db/client';
 import { models, providers } from '@/db/schema';
 import { asc, desc, count, eq } from 'drizzle-orm';
 import Link from 'next/link';
+import CardStack from '@/components/CardStack';
+import '@/styles/responsive.css';
 import { parseModelFilters, buildModelWhereClause } from '@/lib/filters';
 
 export const dynamic = 'force-dynamic';
@@ -346,6 +348,32 @@ export default async function ModelsPage({ searchParams }: PageProps) {
                     </tr>
                   );
                 })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile card stack view */}
+          <div className="responsive-card-stack">
+            <CardStack 
+              data={modelRows.map(m => ({
+                status: m.status,
+                provider: m.providerName,
+                name: m.name,
+                contextWindow: `${m.contextWindow.toLocaleString()} tokens`,
+                inputPrice: `${Number(m.inputPricePerM).toFixed(4)}`,
+                outputPrice: `${Number(m.outputPricePerM).toFixed(4)}`,
+                updatedAt: new Date(m.updatedAt).toISOString().split('T')[0]
+              }))}
+              labels={{
+                status: 'Status',
+                provider: 'Provider',
+                name: 'Name',
+                contextWindow: 'Context Window',
+                inputPrice: 'Input Price (/1M)',
+                outputPrice: 'Output Price (/1M)',
+                updatedAt: 'Updated At'
+              }}
+            />
               </tbody>
             </table>
           </div>
