@@ -1,0 +1,1 @@
+Live registry of AI model specs, context windows, and per-1M-token pricing.
