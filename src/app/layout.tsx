@@ -9,7 +9,7 @@ import { formatFreshness } from '@/lib/freshness';
 
 export const metadata: Metadata = {
   title: 'modelright',
-  description: 'Model-driven application',
+  description: 'Live registry of AI model specs, context windows, and $/1M-token pricing across providers — for developers choosing a model, and for agents (everything readable as JSON and llms.txt). Real data only; freshness is visible.',
 };
 
 async function getFreshnessText() {
@@ -39,6 +39,35 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "modelright",
+              "url": "https://modelright.dev",
+              "description": "Live registry of AI model specs, context windows, and $/1M-token pricing across providers — for developers choosing a model, and for agents (everything readable as JSON and llms.txt). Real data only; freshness is visible.",
+              "sameAs": [
+                "https://github.com/homezloco/modelright"
+              ]
+            })
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "modelright",
+              "url": "https://modelright.dev",
+              "description": "Live registry of AI model specs, context windows, and $/1M-token pricing across providers — for developers choosing a model, and for agents (everything readable as JSON and llms.txt). Real data only; freshness is visible."
+            })
+          }}
+        />
+      </head>
       <body style={{ margin: 0, fontFamily: 'system-ui, -apple-system, sans-serif', backgroundColor: '#0f172a', color: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <header style={{ borderBottom: '1px solid #1e293b', backgroundColor: '#0f172a', padding: '1rem 2rem' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
@@ -79,7 +108,7 @@ export default async function RootLayout({
         <footer style={{ borderTop: '1px solid #1e293b', backgroundColor: '#0f172a', padding: '1.5rem 2rem', marginTop: 'auto', color: '#64748b', fontSize: '0.875rem' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
-              &copy; {new Date().getFullYear()} modelright. AI model specification &amp; pricing registry.
+              &copy; {new Date().getFullYear()} modelright. AI model specification & pricing registry.
               <span style={{ marginLeft: '1rem', color: '#475569' }}>{freshnessText}</span>
             </div>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
