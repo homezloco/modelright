@@ -147,6 +147,20 @@ export default async function ModelsPage({ searchParams }: PageProps) {
 
   return (
     <main style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org/",
+          "@type": "Dataset",
+          "name": "AI Model Specifications and Pricing",
+          "description": "Live registry of AI model specs, context windows, and $/1M-token pricing across providers",
+          "url": "https://modelright.dev/models",
+          "keywords": "AI, machine learning, models, pricing, context window, API",
+          "creator": {
+            "@type": "Organization",
+            "name": "modelright"
+          }
+        })
+      }} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
         <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', margin: 0 }}>Models</h1>
 
