@@ -9,12 +9,12 @@ export const dynamic = 'force-dynamic';
 const PAGE_SIZE = 50;
 
 interface PageProps {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }> | { [key: string]: string | string[] | undefined };
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function ModelsPage({ searchParams }: PageProps) {
-  const resolvedParams = searchParams ? await Promise.resolve(searchParams) : {};
-  
+export default async function ModelsPage(props: PageProps) {
+  const resolvedParams = (await props.searchParams) ?? {};
+
   const sortParam = (typeof resolvedParams.sort === 'string' ? resolvedParams.sort : '') || '';
   const rawPage = parseInt((typeof resolvedParams.page === 'string' ? resolvedParams.page : '1') || '1', 10);
   const currentPage = isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;

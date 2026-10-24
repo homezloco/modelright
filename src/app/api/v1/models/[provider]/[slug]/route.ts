@@ -18,8 +18,9 @@ export async function OPTIONS() {
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { provider: string; slug: string } }
+  props: { params: Promise<{ provider: string; slug: string }> }
 ) {
+  const params = await props.params;
   try {
     const rows = await db
       .select({

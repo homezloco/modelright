@@ -76,7 +76,7 @@ describe('q-0016 route tests', () => {
       [{ ...modelRow, modelId: 'm1' }],
       [{ capturedAt: new Date(), availability: 'available', inputPricePerM: '2.5', outputPricePerM: '10' }],
     ];
-    const res = await detailGet(req('http://localhost/x'), { params: { provider: 'openai', slug: 'gpt-5' } });
+    const res = await detailGet(req('http://localhost/x'), { params: Promise.resolve({ provider: 'openai', slug: 'gpt-5' }) });
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.snapshots).toHaveLength(1);
@@ -84,7 +84,7 @@ describe('q-0016 route tests', () => {
 
   it('GET /api/v1/models/{p}/{s} returns 404 for unknown pair', async () => {
     sharedQueue = [[]];
-    const res = await detailGet(req('http://localhost/x'), { params: { provider: 'nope', slug: 'nope' } });
+    const res = await detailGet(req('http://localhost/x'), { params: Promise.resolve({ provider: 'nope', slug: 'nope' }) });
     expect(res.status).toBe(404);
   });
 
