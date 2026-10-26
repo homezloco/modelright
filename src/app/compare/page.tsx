@@ -97,6 +97,15 @@ export default async function ComparePage(props: PageProps) {
 
   return (
     <main style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif', maxWidth: '1100px', margin: '0 auto' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Compare AI Models - modelright",
+          "description": "Compare specifications, pricing, and capabilities side-by-side across AI model providers.",
+          "url": "https://modelright.dev/compare"
+        })
+      }} />
       <h1>Compare Models</h1>
       <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>
         Compare specifications, pricing, and capabilities side-by-side across AI model providers.
