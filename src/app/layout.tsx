@@ -7,9 +7,13 @@ import { ingestLog } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { formatFreshness } from '@/lib/freshness';
 
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://modelright.dev';
+
 export const metadata: Metadata = {
-  title: 'modelright',
-  description: 'Model-driven application',
+  metadataBase: new URL(siteUrl),
+  title: 'modelright — AI model specification & pricing registry',
+  description:
+    'Continuously updated specs, context windows, and per-million-token pricing across LLMs and vision models — with rankings, comparisons, a cost calculator, and a public API.',
 };
 
 async function getFreshnessText() {

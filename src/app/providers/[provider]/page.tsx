@@ -7,9 +7,9 @@ import { eq, asc } from 'drizzle-orm';
 export const dynamic = 'force-dynamic';
 
 interface ProviderDetailPageProps {
-  params: {
+  params: Promise<{
     provider: string;
-  };
+  }>;
 }
 
 
@@ -58,7 +58,8 @@ async function getProviderData(providerSlug: string) {
   }
 }
 
-export default async function ProviderDetailPage({ params }: ProviderDetailPageProps) {
+export default async function ProviderDetailPage(props: ProviderDetailPageProps) {
+  const params = await props.params;
   const providerData = await getProviderData(params.provider);
 
   if (!providerData) {
