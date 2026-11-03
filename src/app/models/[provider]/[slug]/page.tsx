@@ -10,10 +10,10 @@ import { extractAABenchmarks } from '@/lib/aa-benchmarks';
 import { CostCalculator } from '@/components/CostCalculator';
 
 interface ModelDetailPageProps {
-  params: {
+  params: Promise<{
     provider: string;
     slug: string;
-  };
+  }>;
 }
 
 async function getModelData(providerSlug: string, modelSlug: string) {
@@ -84,7 +84,8 @@ async function getModelData(providerSlug: string, modelSlug: string) {
   }
 }
 
-export default async function ModelDetailPage({ params }: ModelDetailPageProps) {
+export default async function ModelDetailPage(props: ModelDetailPageProps) {
+  const params = await props.params;
   const model = await getModelData(params.provider, params.slug);
 
   if (!model) {
