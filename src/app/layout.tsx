@@ -43,6 +43,35 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "modelright",
+              "url": "https://modelright.dev",
+              "description": "Live registry of AI model specs, context windows, and $/1M-token pricing across providers — for developers choosing a model, and for agents (everything readable as JSON and llms.txt). Real data only; freshness is visible.",
+              "sameAs": [
+                "https://github.com/homezloco/modelright"
+              ]
+            })
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "modelright",
+              "url": "https://modelright.dev",
+              "description": "Live registry of AI model specs, context windows, and $/1M-token pricing across providers — for developers choosing a model, and for agents (everything readable as JSON and llms.txt). Real data only; freshness is visible."
+            })
+          }}
+        />
+      </head>
       <body style={{ margin: 0, fontFamily: 'system-ui, -apple-system, sans-serif', backgroundColor: '#0f172a', color: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <header style={{ borderBottom: '1px solid #1e293b', backgroundColor: '#0f172a', padding: '1rem 2rem' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
