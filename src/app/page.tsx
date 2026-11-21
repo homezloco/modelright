@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { db } from '@/db/client';
 import { models, modelSnapshots, providers } from '@/db/schema';
 import {
@@ -78,28 +79,31 @@ async function getWeeklyMovers(): Promise<WeeklyMovers | null> {
   }
 }
 
+export const metadata: Metadata = {
+  title: 'modelright — AI model specification & pricing registry',
+  description:
+    'Live registry of AI model specs, context windows, and per-million-token pricing across providers — rankings, comparisons, cost calculator, and a public API.',
+  alternates: { canonical: 'https://modelright.dev' },
+};
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'modelright',
+  url: 'https://modelright.dev',
+  description:
+    'Live registry of AI model specs, context windows, and per-million-token pricing across providers.',
+};
+
 export default async function Home() {
   const movers = await getWeeklyMovers();
 
   return (
     <main style={{ maxWidth: '800px', margin: '0 auto', padding: '3rem 1.5rem', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          "name": "modelright",
-          "url": "https://modelright.dev",
-          "description": "Live registry of AI model specs, context windows, and $/1M-token pricing across providers — for developers choosing a model, and for agents (everything readable as JSON and llms.txt). Real data only; freshness is visible.",
-          "publisher": {
-            "@type": "Organization",
-            "name": "modelright",
-            "logo": {
-              "@type": "ImageObject",
-              "url": "https://modelright.dev/logo.png"
-            }
-          }
-        })
-      }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
       <section style={{ marginBottom: '3rem', textAlign: 'center' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem', letterSpacing: '-0.02em' }}>
           Real-time AI Model Specs, Context Windows & Pricing

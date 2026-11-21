@@ -7,9 +7,13 @@ import { ingestLog } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { formatFreshness } from '@/lib/freshness';
 
+const siteUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://modelright.dev';
+
 export const metadata: Metadata = {
-  title: 'modelright',
-  description: 'Live registry of AI model specs, context windows, and $/1M-token pricing across providers — for developers choosing a model, and for agents (everything readable as JSON and llms.txt). Real data only; freshness is visible.',
+  metadataBase: new URL(siteUrl),
+  title: 'modelright — AI model specification & pricing registry',
+  description:
+    'Continuously updated specs, context windows, and per-million-token pricing across LLMs and vision models — with rankings, comparisons, a cost calculator, and a public API.',
 };
 
 async function getFreshnessText() {
@@ -108,7 +112,7 @@ export default async function RootLayout({
         <footer style={{ borderTop: '1px solid #1e293b', backgroundColor: '#0f172a', padding: '1.5rem 2rem', marginTop: 'auto', color: '#64748b', fontSize: '0.875rem' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
-              &copy; {new Date().getFullYear()} modelright. AI model specification & pricing registry.
+              &copy; {new Date().getFullYear()} modelright. AI model specification &amp; pricing registry.
               <span style={{ marginLeft: '1rem', color: '#475569' }}>{freshnessText}</span>
             </div>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
